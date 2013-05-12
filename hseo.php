@@ -40,7 +40,7 @@ class hSEO extends Tags
     private $succesm = false;
     
     public $seofuncs;
-    
+       
     /**
     * 
     *
@@ -48,7 +48,7 @@ class hSEO extends Tags
     * @param 
     * @return 
     */ 
-        function __construct($h) {
+        function __construct() {
             
 //        require_once(PLUGINS . 'hseo/libs/hSEOFunctions.php');
 //        $seofuncs = new hSEO_Functions($h);
