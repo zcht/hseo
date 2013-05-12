@@ -48,11 +48,9 @@ class hSEOSettings
         $hseo_post_description = $hseo_settings['hseo_post_description'];
         $hseo_post_keywords = $hseo_settings['hseo_post_keywords'];
         $hseo_post_canonical = $hseo_settings['hseo_post_canonical'];
-        
         $hseo_post_cache = $hseo_settings['hseo_post_cache'];
         $hseo_post_follow = $hseo_settings['hseo_post_follow'];
         $hseo_post_index = $hseo_settings['hseo_post_index'];
-        
         $hseo_post_opengraph = $hseo_settings['hseo_post_opengraph'];
         
         $h->pluginHook('hseo_settings_get_values');
@@ -77,28 +75,12 @@ class hSEOSettings
         if (!$hseo_post_description) { $hseo_post_description = ''; }
         if (!$hseo_post_keywords) { $hseo_post_keywords = ''; }
         if (!$hseo_post_canonical) { $hseo_post_canonical = ''; } 
-        
         if (!$hseo_post_cache) { $hseo_post_cache = ''; }
         if (!$hseo_post_follow) { $hseo_post_follow = ''; }
         if (!$hseo_post_index) { $hseo_post_index = ''; } 
-        
         if (!$hseo_post_opengraph) { $hseo_post_opengraph = ''; }
 
-        // Get settings from database if they exist...
-//        $hseo_settings = $h->getSerializedSettings();
-//
-//        $hseo_post_title = $hseo_settings['hseo_post_title'];
-//        $hseo_post_description = $hseo_settings['hseo_post_description'];
-//        $hseo_post_keywords = $hseo_settings['hseo_post_keywords'];
-//        $hseo_post_canonical = $hseo_settings['hseo_post_canonical'];
-//        
-//        $hseo_post_cache = $hseo_settings['hseo_post_cache'];
-//        $hseo_post_follow = $hseo_settings['hseo_post_follow'];
-//        $hseo_post_index = $hseo_settings['hseo_post_index'];
-//        
-//        $hseo_post_opengraph = $hseo_settings['hseo_post_opengraph'];
-
-              
+            
         echo "<form name='hseo_settings_form' action='" . BASEURL . "admin_index.php?page=plugin_settings&amp;plugin=hseo' method='post'>\n";
         
         echo "<hr><p>" . $h->lang["hseo_settings_instructions"] . "</p>";
