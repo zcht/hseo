@@ -33,28 +33,8 @@
  * @link      http://www.hotarucms.org/
  */
 
-class hSEO extends Tags
-{    
-        
-    private $settings = false;
-    private $succesm = false;
-    
-    public $seofuncs;
-       
-    /**
-    * 
-    *
-    * @param 
-    * @param 
-    * @return 
-    */ 
-        function __construct() {
-            
-//        require_once(PLUGINS . 'hseo/libs/hSEOFunctions.php');
-//        $seofuncs = new hSEO_Functions($h);
-//        $seofuncs->hseo_post_redirect($h);
-        
-    }
+class hSEO
+{             
     
     /**
     * 
@@ -71,17 +51,13 @@ class hSEO extends Tags
         if (!isset($hseo_settings['hseo_post_title'])) { $hseo_settings['hseo_post_title'] = 'checked'; }
         if (!isset($hseo_settings['hseo_post_description'])) { $hseo_settings['hseo_post_description'] = 'checked'; }
         if (!isset($hseo_settings['hseo_post_keywords'])) { $hseo_settings['hseo_post_keywords'] = 'checked'; }
-        if (!isset($hseo_settings['hseo_post_canonical'])) { $hseo_settings['hseo_post_canonical'] = 'checked'; }
-        
+        if (!isset($hseo_settings['hseo_post_canonical'])) { $hseo_settings['hseo_post_canonical'] = 'checked'; }        
         if (!isset($hseo_settings['hseo_post_cache'])) { $hseo_settings['hseo_post_cache'] = ''; }
         if (!isset($hseo_settings['hseo_post_follow'])) { $hseo_settings['hseo_post_follow'] = 'checked'; }
-        if (!isset($hseo_settings['hseo_post_index'])) { $hseo_settings['hseo_post_index'] = 'checked'; }
-        
+        if (!isset($hseo_settings['hseo_post_index'])) { $hseo_settings['hseo_post_index'] = 'checked'; }        
         if (!isset($hseo_settings['hseo_post_opengraph'])) { $hseo_settings['hseo_post_opengraph'] = 'checked'; }
         
-        $this->settings = $hseo_settings;
         $h->updateSetting('hseo_settings', serialize($hseo_settings));
-
     }
     
     
