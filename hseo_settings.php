@@ -37,7 +37,7 @@ class hSEOSettings
             $this->saveSettings($h); 
         }
         
-        //echo "<h1>" . $h->lang["hseo_settings_header"] . "</h1>\n";
+        echo "<h1>" . $h->lang["hseo_settings_header"] . "</h1>\n";
         
         // Get settings from database if they exist...
         $hseo_settings = $h->getSerializedSettings();
@@ -67,18 +67,20 @@ class hSEOSettings
             
         echo "<form name='hseo_settings_form' action='" . BASEURL . "admin_index.php?page=plugin_settings&amp;plugin=hseo' method='post'>\n";
         
-        echo "<hr><p>" . $h->lang["hseo_settings_instructions"] . "</p>";
+        echo "<hr><p class=\"breadcrumb\">" . $h->lang["hseo_settings_instructions"] . "</p>";
         
-        echo "<h3>Posts Einstellungen</h3>";
+        echo "<h3>" . $h->lang["hseo_settings_post"] . "</h3>";
         
         echo "<p><input type='checkbox' name='hseo_post_title' value='hseo_post_title' " . $hseo_post_title . " >&nbsp;&nbsp;" . $h->lang["hseo_post_title"] . "</p>\n";
         echo "<p><input type='checkbox' name='hseo_post_description' value='hseo_post_description' " . $hseo_post_description . " >&nbsp;&nbsp;" . $h->lang["hseo_post_description"] . "</p>\n";
         echo "<p><input type='checkbox' name='hseo_post_keywords' value='hseo_post_keywords' " . $hseo_post_keywords . " >&nbsp;&nbsp;" . $h->lang["hseo_post_keywords"] . "</p>\n";
         echo "<p><input type='checkbox' name='hseo_post_canonical' value='hseo_post_canonical' " . $hseo_post_canonical . " >&nbsp;&nbsp;" . $h->lang["hseo_post_canonical"] . "</p>\n";
+        echo "<p><input type='checkbox' name='hseo_post_opengraph' value='hseo_post_opengraph' " . $hseo_post_opengraph . " >&nbsp;&nbsp;" . $h->lang["hseo_post_opengraph"] . "</p>\n";
+        
+        echo "<p>" . $h->lang["hseo_post_robots"] . "</p>\n";
         echo "<p><input type='checkbox' name='hseo_post_cache' value='hseo_post_cache' " . $hseo_post_cache . " >&nbsp;&nbsp;" . $h->lang["hseo_post_cache"] . "</p>\n";
         echo "<p><input type='checkbox' name='hseo_post_follow' value='hseo_post_follow' " . $hseo_post_follow . " >&nbsp;&nbsp;" . $h->lang["hseo_post_follow"] . "</p>\n";
         echo "<p><input type='checkbox' name='hseo_post_index' value='hseo_post_index' " . $hseo_post_index . " >&nbsp;&nbsp;" . $h->lang["hseo_post_index"] . "</p>\n";
-        echo "<p><input type='checkbox' name='hseo_post_opengraph' value='hseo_post_opengraph' " . $hseo_post_opengraph . " >&nbsp;&nbsp;" . $h->lang["hseo_post_opengraph"] . "</p>\n";
 
         $h->pluginHook('hseo_settings_form');
                 

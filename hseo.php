@@ -2,10 +2,9 @@
 /**
  * name: hSEO
  * description: swiss knife for hotaru seo. with innovations from germany.
- * version: 0.2
+ * version: 0.3
  * folder: hseo
  * class: hSEO
- * extends: tags
  * type: toolbox
  * hooks: install_plugin, admin_sidebar_plugin_settings, admin_plugin_settings, header_meta, theme_index_top
  * author: Andreas Votteler
@@ -87,7 +86,6 @@ class hSEO
         {    
             require_once(PLUGINS . 'hseo/libs/hSEOFunctions.php');
             $f = new hSEO_Functions($h);
-            
             $f->hseo_post_redirect($h);
             $f->getmeta($h);
            
