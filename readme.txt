@@ -22,5 +22,5 @@ Instructions
 
 Changelog
 ---------
-v0.1 2013/05/11 - narc - Released first version
 v0.2 2013/05/12 - narc - some fixes
+v0.1 2013/05/11 - narc - Released first version

@@ -1,7 +1,7 @@
 <?php
 /**
  * File: /plugins/hseo/hseo_settings.php
- * Purpose: Admin settings for the Metatags plugin
+ * Purpose: Admin settings for the hseo plugin
  *
  * PHP version 5
  *
@@ -37,33 +37,20 @@ class hSEOSettings
             $this->saveSettings($h); 
         }
         
-        echo "<h1>" . $h->lang["hseo_settings_header"] . "</h1>\n";
+        //echo "<h1>" . $h->lang["hseo_settings_header"] . "</h1>\n";
         
         // Get settings from database if they exist...
-//        $hseo_settings = $h->getSerializedSettings();
-//        
-//        $hseo_post_title = $hseo_settings['hseo_post_title'];
-//        $hseo_post_description = $hseo_settings['hseo_post_description'];
-//        $hseo_post_keywords = $hseo_settings['hseo_post_keywords'];
-//        $hseo_post_canonical = $hseo_settings['hseo_post_canonical'];
-//        $hseo_post_cache = $hseo_settings['hseo_post_cache'];
-//        $hseo_post_follow = $hseo_settings['hseo_post_follow'];
-//        $hseo_post_index = $hseo_settings['hseo_post_index'];
-//        $hseo_post_opengraph = $hseo_settings['hseo_post_opengraph'];
-//        
-//        $h->pluginHook('hseo_settings_get_values');
+        $hseo_settings = $h->getSerializedSettings();
         
-        
-        // Get settings from database if they exist...
-        $hseo_post_title = $h->getSetting('hseo_post_title');
-        $hseo_post_description = $h->getSetting('hseo_post_description');
-        $hseo_post_keywords = $h->getSetting('hseo_post_keywords');
-        $hseo_post_canonical = $h->getSetting('hseo_post_canonical');
-        $hseo_post_cache = $h->getSetting('hseo_post_cache');
-        $hseo_post_follow = $h->getSetting('hseo_post_follow');
-        $hseo_post_index = $h->getSetting('hseo_post_index');
-        $hseo_post_opengraph = $h->getSetting('hseo_post_opengraph');
-    
+        $hseo_post_title = $hseo_settings['hseo_post_title'];
+        $hseo_post_description = $hseo_settings['hseo_post_description'];
+        $hseo_post_keywords = $hseo_settings['hseo_post_keywords'];
+        $hseo_post_canonical = $hseo_settings['hseo_post_canonical'];
+        $hseo_post_cache = $hseo_settings['hseo_post_cache'];
+        $hseo_post_follow = $hseo_settings['hseo_post_follow'];
+        $hseo_post_index = $hseo_settings['hseo_post_index'];
+        $hseo_post_opengraph = $hseo_settings['hseo_post_opengraph'];        
+
         $h->pluginHook('hseo_settings_get_values');
         
         
@@ -110,55 +97,55 @@ class hSEOSettings
      */
     public function saveSettings($h)
     {
-        $error = 0;
+        $error = 0;      
         
         // test post cache robot
         if ($h->cage->post->keyExists('hseo_post_title')) { 
-            $hseo_post_title['hseo_post_title'] = $h->cage->post->testAlnumLines('hseo_post_title');
+            $hseo_post_title = 'checked';
         } else {
-            $hseo_post_title['hseo_post_title'] = '';
+            $hseo_post_title = '';
         }
 
         if ($h->cage->post->keyExists('hseo_post_description')) { 
-            $hseo_post_description['hseo_post_description'] = $h->cage->post->testAlnumLines('hseo_post_description');
+            $hseo_post_description = 'checked';
         } else {
-            $hseo_post_description['hseo_post_description'] = '';
+            $hseo_post_description = '';
         }
 
          if ($h->cage->post->keyExists('hseo_post_keywords')) { 
-            $hseo_post_keywords['hseo_post_keywords'] = $h->cage->post->testAlnumLines('hseo_post_keywords');
+            $hseo_post_keywords = 'checked';
         } else {
-            $hseo_post_keywords['hseo_post_keywords'] = '';
+            $hseo_post_keywords = '';
         }
         
         if ($h->cage->post->keyExists('hseo_post_canonical')) { 
-            $hseo_post_canonical['hseo_post_canonical'] = $h->cage->post->testAlnumLines('hseo_post_canonical');
+            $hseo_post_canonical = 'checked';
         } else {
-            $hseo_post_canonical['hseo_post_canonical'] = '';
+            $hseo_post_canonical = '';
         }
         
         if ($h->cage->post->keyExists('hseo_post_cache')) { 
-            $hseo_post_cache['hseo_post_cache'] = $h->cage->post->testAlnumLines('hseo_post_cache');
+            $hseo_post_cache = 'checked';
         } else {
-            $hseo_post_cache['hseo_post_cache'] = '';
+            $hseo_post_cache = '';
         }
         
         if ($h->cage->post->keyExists('hseo_post_follow')) { 
-            $hseo_post_follow['hseo_post_follow'] = $h->cage->post->testAlnumLines('hseo_post_follow');
+            $hseo_post_follow = 'checked';
         } else {
-            $hseo_post_follow['hseo_post_follow'] = '';
+            $hseo_post_follow = '';
         }
         
         if ($h->cage->post->keyExists('hseo_post_index')) { 
-            $hseo_post_index['hseo_post_index'] = $h->cage->post->testAlnumLines('hseo_post_index');
+            $hseo_post_index = 'checked';
         } else {
-            $hseo_post_index['hseo_post_index'] = '';
+            $hseo_post_index = '';
         }
         
         if ($h->cage->post->keyExists('hseo_post_opengraph')) { 
-            $hseo_post_opengraph['hseo_post_opengraph'] = $h->cage->post->testAlnumLines('hseo_post_opengraph');
+            $hseo_post_opengraph = 'checked';
         } else {
-            $hseo_post_opengraph['hseo_post_opengraph'] = '';
+            $hseo_post_opengraph = '';
         }
         
         
@@ -166,14 +153,16 @@ class hSEOSettings
         
         if ($error == 0) {
             // save settings
-            $h->updateSetting('hseo_post_title', $hseo_post_title);
-            $h->updateSetting('hseo_post_description', $hseo_post_description);
-            $h->updateSetting('hseo_post_keywords', $hseo_post_keywords);
-            $h->updateSetting('hseo_post_canonical', $hseo_post_canonical);
-            $h->updateSetting('hseo_post_cache', $hseo_post_cache);
-            $h->updateSetting('hseo_post_follow', $hseo_post_follow);
-            $h->updateSetting('hseo_post_index', $hseo_post_index);
-            $h->updateSetting('hseo_post_opengraph', $hseo_post_opengraph);
+            $hseo_settings['hseo_post_title'] = $hseo_post_title;
+            $hseo_settings['hseo_post_description'] = $hseo_post_description;
+            $hseo_settings['hseo_post_keywords'] = $hseo_post_keywords;
+            $hseo_settings['hseo_post_canonical'] = $hseo_post_canonical;
+            $hseo_settings['hseo_post_cache'] = $hseo_post_cache;
+            $hseo_settings['hseo_post_follow'] = $hseo_post_follow;
+            $hseo_settings['hseo_post_index'] = $hseo_post_index;
+            $hseo_settings['hseo_post_opengraph'] = $hseo_post_opengraph;
+            
+            $h->updateSetting('hseo_settings', serialize($hseo_settings));
             
             $h->message = $h->lang["main_settings_saved"];
             $h->messageType = "green alert-success";
