@@ -38,6 +38,11 @@ class hSEO_Functions
             'favicon' => $this->get_favicon(),
             'canonical' => $this->meta_canonical($h)
             );
+        
+//        $this->staticpage = array (
+//            'name' => hSEOSettings::static_pages($h)
+//        );
+        
     }
 
  /**
@@ -70,7 +75,15 @@ class hSEO_Functions
    private function meta_title($h) {
        
        $hseo_settings = $h->getSerializedSettings();
-       $title = $hseo_settings['hseo_post_title'];
+       
+       if ($h->pageType == 'post') { 
+           $title = $hseo_settings['hseo_post_title'];
+       }
+       
+       if ($h->cage->get->testPage('page')) {
+           $title = $hseo_settings['hseo_staticpage_title_'.$h->cage->get->testPage('page')];
+        }
+       
        if ($title == true) {
             return "<title>". $h->getTitle() ."</title>"."\n";
        }
@@ -87,9 +100,10 @@ class hSEO_Functions
  */ 
 private function get_favicon() {
     
-        $favicon = SITEURL . "favicon.ico";
+        $favicon = BASE . "favicon.ico";
         
         if (file_exists($favicon)) {
+            $favicon = BASEURL . "favicon.ico";
             $get_favicon = "<link rel=\"shortcut icon\" href=\"data:image/x-icon;base64," . base64_encode(file_get_contents( $favicon)) ."\" />"."\n";
             return $get_favicon;
         } else {
@@ -107,8 +121,19 @@ private function get_favicon() {
  * @return 
  */ 
 private function meta_robots($h, $cache = true, $index = true, $follow = true) {
+
+        if ($h->pageType == 'list') { $cache = false; $index = false; $follow = true; }
+        if ($h->pageType == 'login' || $h->pageType == 'register' || $h->pageType == 'pending' || $h->pageType == 'buried') { $cache = false; $index = false; $follow = true; }
+//        if ($h->pageType == 'user') { $cache = false; $index = true; $follow = true; }
+//        if ($h->pageType == 'all') { $cache = false; $index = false; $follow = true; }    
+    
+        if ($h->isHome()) { 
+            $hseo_settings = $h->getSerializedSettings();
+            $cache = $hseo_settings['hseo_home_cache'];
+            $follow = $hseo_settings['hseo_home_follow'];
+            $index = $hseo_settings['hseo_home_index'];
+        }
         
-        if ($h->isHome()) { $cache = false; $index = true; $follow = true; }
         if ($h->pageType == 'post') { 
             $hseo_settings = $h->getSerializedSettings();
             $cache = $hseo_settings['hseo_post_cache'];
@@ -116,12 +141,15 @@ private function meta_robots($h, $cache = true, $index = true, $follow = true) {
             $index = $hseo_settings['hseo_post_index'];
           //  $cache = false; $index = true; $follow = true; 
         }
-        if ($h->pageType == 'list') { $cache = false; $index = false; $follow = true; }
-        if ($h->pageType == 'login') { $cache = false; $index = false; $follow = true; }
-        if ($h->pageType == 'register') { $cache = false; $index = false; $follow = true; }
-        if ($h->pageType == 'pending') { $cache = false; $index = false; $follow = true; }
-        if ($h->pageType == 'buried') { $cache = false; $index = false; $follow = true; }
-        if ($h->pageType == 'user') { $cache = false; $index = true; $follow = true; }
+        
+        // static pages
+        if ($h->cage->get->testPage('page')) {
+            $hseo_settings = $h->getSerializedSettings();
+            $cache = $hseo_settings['hseo_staticpage_cache_'.$h->cage->get->testPage('page')];
+            $follow = $hseo_settings['hseo_staticpage_follow_'.$h->cage->get->testPage('page')];
+            $index = $hseo_settings['hseo_staticpage_index_'.$h->cage->get->testPage('page')];
+        }
+
         
         if ($cache == true) {
             $cache = "";
@@ -191,8 +219,12 @@ private function meta_robots($h, $cache = true, $index = true, $follow = true) {
         if ($h->post->status == 'pending' || $h->post->status == 'buried')  { return false; }
         
                if ($h->pageName == $h->isHome()) {
-                   $meta_canonical = "<link rel=\"canonical\" href=\"" . SITEURL ."\" />"."\n";
-                   return $meta_canonical;
+                    $hseo_settings = $h->getSerializedSettings();
+                    $canonical = $hseo_settings['hseo_home_canonical'];
+                    if ($canonical == true) {
+                        $meta_canonical = "<link rel=\"canonical\" href=\"" . SITEURL ."\" />"."\n";
+                        return $meta_canonical;
+                    }
                }
 
                if ( $h->pageName == 'login' || $h->pageName == 'register' || $h->pageTitle == '404' || $h->pageType == 'list')  {
@@ -238,13 +270,35 @@ private function meta_robots($h, $cache = true, $index = true, $follow = true) {
                 $meta_description = sanitize($h->post->content, 'all');
                 $meta_description = truncate($meta_description, 160);
                 $meta_description = preg_replace('/(\\x0D|\\x0A|\\x0D\\x0A){2,}/', '', $meta_description);
+                $meta_description = nl2br($meta_description,"\0");
                 $meta_description = "<meta name=\"description\" content=\"" . $meta_description ."\" />"."\n";
                 return $meta_description;
             }
         } else {
             $meta_description = '<meta name="description" content="' . $h->lang['header_meta_description'] . '" />'."\n"; // default meta tags
             return $meta_description;
-        }        
+        }
+        
+                // static pages
+        if ($h->cage->get->testPage('page')) {
+            $hseo_settings = $h->getSerializedSettings();
+            
+            //static page name
+            $staticpage = $h->cage->get->testPage('page');
+            
+            $description = $hseo_settings['hseo_staticpage_description'][$staticpage];
+            if ($description == true) {
+                $meta_description = sanitize($h->post->content, 'all');
+                $meta_description = truncate($meta_description, 160);
+                $meta_description = preg_replace('/(\\x0D|\\x0A|\\x0D\\x0A){2,}/', '', $meta_description);
+                $meta_description = nl2br($meta_description,"\0");
+                $meta_description = "<meta name=\"description\" content=\"" . $meta_description ."\" />"."\n";
+                return $meta_description . " - " . $staticpage;
+            }
+        } else {
+            $meta_description = '<meta name="description" content="' . $h->lang['header_meta_description'] . '" />'."\n"; // default meta tags
+            return $meta_description;
+        }
 
     }
     
@@ -365,6 +419,94 @@ private function meta_robots($h, $cache = true, $index = true, $follow = true) {
                     }
              }      
                     return;
+        }
+        
+        
+        
+/**
+ * 
+ *
+ * @param 
+ * @param 
+ * @return 
+ */ 
+    private function static_pages($h) {
+        
+        // Mit den folgenden Zeilen lassen sich
+        // alle Dateien in einem Verzeichnis auslesen
+        $handle=opendir (".");
+        echo "Verzeichnisinhalt:<br>";
+        while ($datei = readdir ($handle)) {
+         echo "$datei<br>";
+        }
+        closedir($handle);
+        
+            //Das auszulesende Verzeichnis
+            $dir = ".";
+
+            //Das Ziel-Array
+            $file_array = Array();
+
+            //Wenn das Verzeichnis existiert...
+            if(is_dir($dir))    {
+                //...öffne das Verzeichnis
+                $handle = opendir($dir);
+                //Wenn das Verzeichnis geöffnet werden konnte...
+                if(is_resource($handle))    {
+                    //...lese die enthaltenen Dateien aus,...
+                    while($file = readdir($handle))    {
+                        //...prüfe ob es Directory-Verweise sind...
+                        if($file != "." && $file != "..")
+                            //...und schreibe sie in das Ziel-Array
+                            array_push($file_array, $file);
+                    }
+                }else{
+                    echo "Das &Ouml;ffnen des Verzeichnisses ist fehlgeschlagen";
+                }
+            }else{
+                echo "Das Verzeichnis existiert nicht";
+            }
+            //Zum Schluss wird das Array ausgegeben
+            print_r($file_array);
+        
+        $h->getPageName($h);
+        
+        
+            //Das auszulesende Verzeichnis
+    $dir = ".";
+
+    //Das Ziel-Array
+    $file_array = Array();
+
+    //Wenn das Verzeichnis existiert...
+    if(is_dir($dir))    {
+        //...öffne das Verzeichnis
+        $handle = opendir($dir);
+        //Wenn das Verzeichnis geöffnet werden konnte...
+        if(is_resource($handle))    {
+            //...lese die enthaltenen Dateien aus,...
+            while($file = readdir($handle))    {
+                //...prüfe ob es Directory-Verweise sind...
+                if($file != "." && $file != "..")
+                    //...und schreibe sie in das Ziel-Array
+                    array_push($file_array, $file);
+            }
+        }else{
+            echo "Das &Ouml;ffnen des Verzeichnisses ist fehlgeschlagen";
+        }
+    }else{
+        echo "Das Verzeichnis existiert nicht";
+    }
+    //Zum Schluss wird das Array ausgegeben
+    print_r($file_array);
+        
+
+//        if ($h->isPage('faq'))
+//{
+//    // do something
+//}  
+//$page = $h->cage->get->testPage('page');
+//                    return;
         }
 }
 ?>

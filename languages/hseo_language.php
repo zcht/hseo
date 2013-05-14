@@ -23,20 +23,21 @@ $lang['hseo_license'] = "<!-- This page was optimized by hSEO / http://www.trend
 
 /* Admin Settings */
 $lang['hseo_admin_sidebar'] = "hSEO";
+$lang["hseo_settings"] = "hSEO Settings";
 $lang["hseo_settings_header"] = "hSEO Settings";
 $lang["hseo_settings_instructions"] = "After installation, optimum settings are enabled. According wish you can change the settings here.";
 
 $lang["hseo_settings_post"] = "Settings for posts";
-$lang["hseo_post_title"] = "Generate title tag from heading line";
-$lang["hseo_post_description"] = "Generate description of the content";
-$lang["hseo_post_keywords"] = "Generate meta keywords";
-$lang["hseo_post_canonical"] = "Generate Canonical Url";
+$lang["hseo_title"] = "Generate title tag from heading line";
+$lang["hseo_description"] = "Generate description of the content";
+$lang["hseo_keywords"] = "Generate meta keywords";
+$lang["hseo_canonical"] = "Generate Canonical Url";
 
 $lang["hseo_post_robots"] = "<strong>Settings for robots tag</strong>";
-$lang["hseo_post_cache"] = "Allow to store content in the cache Suchmashcinen <em>(default: disabled)</em>";
-$lang["hseo_post_follow"] = "Follow tag allow <em>(default: enabled)</em>";
-$lang["hseo_post_index"] = "Allow indexing of the content <em>(default: enabled)</em>";
+$lang["hseo_robots_cache"] = "Allow to store content in the cache searchengines";
+$lang["hseo_robots_follow"] = "Follow tag allow";
+$lang["hseo_robots_index"] = "Allow indexing of the content";
 
-$lang["hseo_post_opengraph"] = "Enable Open Graph support";
+$lang["hseo_opengraph"] = "Enable Open Graph support";
 
 ?>
