@@ -6,7 +6,7 @@
  * folder: hseo
  * class: hSEO
  * type: toolbox
- * hooks: install_plugin, admin_sidebar_plugin_settings, admin_plugin_settings, admin_header_include_raw, header_meta, theme_index_top
+ * hooks: install_plugin, admin_sidebar_plugin_settings, admin_plugin_settings, admin_header_include_raw, header_meta, theme_index_top, admin_plugin_tabLabel_pre_first, admin_plugin_tabContent_pre_first, admin_plugin_support
  * author: Andreas Votteler
  * authorurl: http://www.trendkraft.de
  *
@@ -132,7 +132,7 @@ class hSEO
     public function admin_header_include_raw($h)
     {
         if ($h->isSettingsPage('hseo')) {
-            echo '<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-tooltip.js"></script>'."\n";
+            //echo '<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-tooltip.js"></script>'."\n";
             echo "<script type='text/javascript'>
                     $(document).ready(function () {
                     if ($(\"[rel=tooltip]\").length) {
@@ -143,6 +143,25 @@ class hSEO
         }
     }
    
+    public function admin_plugin_tabLabel_pre_first($h)
+    {            
+            echo '<li><a href="#editmeta" data-toggle="tab">Edit meta</a></li>';
+    }        
+
+    public function admin_plugin_tabContent_pre_first($h)
+    {                                    
+            echo '<div class="tab-pane" id="editmeta">';     
+                include('templates/hseo_editmeta.php');
+            echo '</div>';
+    }
+
+    /**
+    * Admin support for plugin
+    */
+    public function admin_plugin_support($h)
+    {
+            echo "<p>You can see Example on www.trendkraft.de</p>";
+    }  
     
     
     public function static_pages($h){

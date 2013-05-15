@@ -75,6 +75,7 @@ class hSEO_Functions
    private function meta_title($h) {
        
        $hseo_settings = $h->getSerializedSettings();
+       $title = false;
        
        if ($h->pageType == 'post') { 
            $title = $hseo_settings['hseo_post_title'];
