@@ -1,6 +1,7 @@
 hSEO Plugin for Hotaru CMS
 ---------------------------------
 Created by: Andreas Votteler
+Author URL: http://www.trendkraft.de
 
 
 Description:
@@ -19,8 +20,11 @@ Instructions
 ------------
 1. Upload the "hSEO" folder to your plugins folder.
 2. Install it from Plugin Management in Admin.
+3. Go to Admin -> Plugin Settings -> hSEO and edit the Settings (optional)
 
 Changelog
 ---------
+v0.4 2013/05/XX - narc - add setting for list, home and static pages. bether usabelity on setting page. fixed favicon.
+v0.3 2013/05/15 - narc / shibuya - implemented settings
 v0.2 2013/05/12 - narc - some fixes
 v0.1 2013/05/11 - narc - Released first version

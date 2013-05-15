@@ -38,6 +38,11 @@ class hSEO_Functions
             'favicon' => $this->get_favicon(),
             'canonical' => $this->meta_canonical($h)
             );
+        
+//        $this->staticpage = array (
+//            'name' => hSEOSettings::static_pages($h)
+//        );
+        
     }
 
  /**
@@ -48,13 +53,11 @@ class hSEO_Functions
  * @return 
  */ 
     public function getmeta($h) {
-    
-    if ($h->post->status == 'pending' || $h->post->status == 'buried')  { return false; }
-
+        
         $currentKey = 0;
         if (empty($this->meta['license'])) {return false;}
         foreach($this->meta as $currentKey => $x ) { 
-            echo $x ."\n";
+            echo $x;
         }
         
     return true;
@@ -70,7 +73,20 @@ class hSEO_Functions
     * @return 
     */ 
    private function meta_title($h) {
-       return "<title>". $h->getTitle() ."</title>";
+       
+       $hseo_settings = $h->getSerializedSettings();
+       
+       if ($h->pageType == 'post') { 
+           $title = $hseo_settings['hseo_post_title'];
+       }
+       
+       if ($h->cage->get->testPage('page')) {
+           $title = $hseo_settings['hseo_staticpage_title_'.$h->cage->get->testPage('page')];
+        }
+       
+       if ($title == true) {
+            return "<title>". $h->getTitle() ."</title>"."\n";
+       }
    }
     
    
@@ -84,10 +100,11 @@ class hSEO_Functions
  */ 
 private function get_favicon() {
     
-        $favicon = SITEURL . "favicon.ico";
+        $favicon = BASE . "favicon.ico";
         
         if (file_exists($favicon)) {
-            $get_favicon = "<link rel=\"shortcut icon\" href=\"data:image/x-icon;base64," . base64_encode(file_get_contents( $favicon)) ."\" />";
+            $favicon = BASEURL . "favicon.ico";
+            $get_favicon = "<link rel=\"shortcut icon\" href=\"data:image/x-icon;base64," . base64_encode(file_get_contents( $favicon)) ."\" />"."\n";
             return $get_favicon;
         } else {
             return false;
@@ -104,20 +121,40 @@ private function get_favicon() {
  * @return 
  */ 
 private function meta_robots($h, $cache = true, $index = true, $follow = true) {
-        
-        if ($h->isHome()) { $cache = false; $index = true; $follow = true; }
-        if ($h->pageType == 'post') { $cache = false; $index = true; $follow = true; }
+
         if ($h->pageType == 'list') { $cache = false; $index = false; $follow = true; }
-        if ($h->pageType == 'login') { $cache = false; $index = false; $follow = true; }
-        if ($h->pageType == 'register') { $cache = false; $index = false; $follow = true; }
-        if ($h->pageType == 'pending') { $cache = false; $index = false; $follow = true; }
-        if ($h->pageType == 'buried') { $cache = false; $index = false; $follow = true; }
-        if ($h->pageType == 'user') { $cache = false; $index = true; $follow = true; }
+        if ($h->pageType == 'login' || $h->pageType == 'register' || $h->pageType == 'pending' || $h->pageType == 'buried') { $cache = false; $index = false; $follow = true; }
+//        if ($h->pageType == 'user') { $cache = false; $index = true; $follow = true; }
+//        if ($h->pageType == 'all') { $cache = false; $index = false; $follow = true; }    
+    
+        if ($h->isHome()) { 
+            $hseo_settings = $h->getSerializedSettings();
+            $cache = $hseo_settings['hseo_home_cache'];
+            $follow = $hseo_settings['hseo_home_follow'];
+            $index = $hseo_settings['hseo_home_index'];
+        }
+        
+        if ($h->pageType == 'post') { 
+            $hseo_settings = $h->getSerializedSettings();
+            $cache = $hseo_settings['hseo_post_cache'];
+            $follow = $hseo_settings['hseo_post_follow'];
+            $index = $hseo_settings['hseo_post_index'];
+          //  $cache = false; $index = true; $follow = true; 
+        }
+        
+        // static pages
+        if ($h->cage->get->testPage('page')) {
+            $hseo_settings = $h->getSerializedSettings();
+            $cache = $hseo_settings['hseo_staticpage_cache_'.$h->cage->get->testPage('page')];
+            $follow = $hseo_settings['hseo_staticpage_follow_'.$h->cage->get->testPage('page')];
+            $index = $hseo_settings['hseo_staticpage_index_'.$h->cage->get->testPage('page')];
+        }
+
         
         if ($cache == true) {
-            $cache = "cache";
+            $cache = "";
         } else {
-            $cache = "nocache";
+            $cache = "nocache, ";
         }
 
         if ($index == true) {
@@ -131,7 +168,7 @@ private function meta_robots($h, $cache = true, $index = true, $follow = true) {
         } else {
             $follow = "nofollow";
         }
-        $robots = "<meta name=\"robots\" content=\"" . $cache. ", " .$index . ", " . $follow ."\" />";
+        $robots = "<meta name=\"robots\" content=\"" . $cache . $index . ", " . $follow ."\" />"."\n";
         return $robots;
  
     }
@@ -151,16 +188,20 @@ private function meta_robots($h, $cache = true, $index = true, $follow = true) {
         
        if ($h->pageType == 'post') {
            if ($h->isActive('tags')) {
-
-               $meta_keywords = '<meta name="keywords" content="' . stripslashes($h->post->tags) . '" />';
+                $hseo_settings = $h->getSerializedSettings();
+                $keywords = $hseo_settings['hseo_post_keywords'];
+                if ($keywords == true) {
+                    $meta_keywords = '<meta name="keywords" content="' . stripslashes($h->post->tags) . '" />'."\n";
+                    return $meta_keywords;
+                }
            } else {
-                $meta_keywords = '<meta name="keywords" content="' . $h->lang['header_meta_keywords'] . '" />';
+                $meta_keywords = '<meta name="keywords" content="' . $h->lang['header_meta_keywords'] . '" />'."\n";
+                return $meta_keywords;
            }
         } else {
-            $meta_keywords = '<meta name="keywords" content="' . $h->lang['header_meta_keywords'] . '" />';
+            $meta_keywords = '<meta name="keywords" content="' . $h->lang['header_meta_keywords'] . '" />'."\n";
+            return $meta_keywords;
         }
-        
-        return $meta_keywords;
        
     }
 
@@ -177,23 +218,30 @@ private function meta_robots($h, $cache = true, $index = true, $follow = true) {
 
         if ($h->post->status == 'pending' || $h->post->status == 'buried')  { return false; }
         
-                // start der SEO Deriktiven, nach PageName oder PageTyp
                if ($h->pageName == $h->isHome()) {
-                   $meta_canonical = "<link rel=\"canonical\" href=\"" . SITEURL ."\" />";
-                   return $meta_canonical;
+                    $hseo_settings = $h->getSerializedSettings();
+                    $canonical = $hseo_settings['hseo_home_canonical'];
+                    if ($canonical == true) {
+                        $meta_canonical = "<link rel=\"canonical\" href=\"" . SITEURL ."\" />"."\n";
+                        return $meta_canonical;
+                    }
                }
 
-               if ( $h->pageName == 'login' || $h->pageName == 'register' || $h->post->status == 'pending' || $h->post->status == 'buried' || $h->pageTitle == '404' || $h->pageType == 'list')  {
+               if ( $h->pageName == 'login' || $h->pageName == 'register' || $h->pageTitle == '404' || $h->pageType == 'list')  {
 
-                }
+               }
 
                if ($h->pageType == 'post')  {
-                   $meta_canonical =  "<link rel=\"canonical\" href=\"". $h->url(array('page'=>$h->post->id)) ."\" />";
-                   return $meta_canonical;
+                    $hseo_settings = $h->getSerializedSettings();
+                    $canonical = $hseo_settings['hseo_post_canonical'];
+                    if ($canonical == true) {
+                        $meta_canonical =  "<link rel=\"canonical\" href=\"". $h->url(array('page'=>$h->post->id)) ."\" />"."\n";
+                        return $meta_canonical;
+                    }
                }
 
                if ($h->pageType == 'user')  { 
-                   $meta_canonical = "<link rel=\"canonical\" href=". $h->url(array('user' => $h->vars['user']->name)) ." />";
+                   $meta_canonical = "<link rel=\"canonical\" href=". $h->url(array('user' => $h->vars['user']->name)) ." />"."\n";
                    return $meta_canonical;
                }
                
@@ -212,18 +260,46 @@ private function meta_robots($h, $cache = true, $index = true, $follow = true) {
  */ 
     private function meta_description($h) {
         
-        if ($h->post->status == 'pending' || $h->post->status == 'buried')  { return false; }
-        
         if ($h->pageType == 'post')  {
-            $meta_description = sanitize($h->post->content, 'all');
-            $meta_description = truncate($meta_description, 160);
-            $meta_description = preg_replace('/(\\x0D|\\x0A|\\x0D\\x0A){2,}/', '', $meta_description);
-            $meta_description = "<meta name=\"description\" content=\"" . $meta_description ."\" />";
+            
+            if ($h->post->status == 'pending' || $h->post->status == 'buried')  { return false; }
+            
+            $hseo_settings = $h->getSerializedSettings();
+            $description = $hseo_settings['hseo_post_description'];
+            if ($description == true) {
+                $meta_description = sanitize($h->post->content, 'all');
+                $meta_description = truncate($meta_description, 160);
+                $meta_description = preg_replace('/(\\x0D|\\x0A|\\x0D\\x0A){2,}/', '', $meta_description);
+                $meta_description = nl2br($meta_description,"\0");
+                $meta_description = "<meta name=\"description\" content=\"" . $meta_description ."\" />"."\n";
+                return $meta_description;
+            }
         } else {
-            $meta_description = '<meta name="description" content="' . $h->lang['header_meta_description'] . '" />';  // default meta tags
-        }        
+            $meta_description = '<meta name="description" content="' . $h->lang['header_meta_description'] . '" />'."\n"; // default meta tags
+            return $meta_description;
+        }
+        
+                // static pages
+        if ($h->cage->get->testPage('page')) {
+            $hseo_settings = $h->getSerializedSettings();
+            
+            //static page name
+            $staticpage = $h->cage->get->testPage('page');
+            
+            $description = $hseo_settings['hseo_staticpage_description'][$staticpage];
+            if ($description == true) {
+                $meta_description = sanitize($h->post->content, 'all');
+                $meta_description = truncate($meta_description, 160);
+                $meta_description = preg_replace('/(\\x0D|\\x0A|\\x0D\\x0A){2,}/', '', $meta_description);
+                $meta_description = nl2br($meta_description,"\0");
+                $meta_description = "<meta name=\"description\" content=\"" . $meta_description ."\" />"."\n";
+                return $meta_description . " - " . $staticpage;
+            }
+        } else {
+            $meta_description = '<meta name="description" content="' . $h->lang['header_meta_description'] . '" />'."\n"; // default meta tags
+            return $meta_description;
+        }
 
-        return $meta_description;
     }
     
     
@@ -237,29 +313,34 @@ private function meta_robots($h, $cache = true, $index = true, $follow = true) {
  */ 
    private function open_graph($h) {
         
-        if ($h->pageType != 'post') { return false; }
-    
-        $meta_content = sanitize($h->post->content, 'all');
-        $meta_content = truncate($meta_content, 100);
-        $meta_content = preg_replace('/(\\x0D|\\x0A|\\x0D\\x0A){2,}/','',$meta_content);
-        $meta_open_graph = '<meta property="og:title" content="' . $h->getTitle(true) . '" />'."\n";
-        $meta_open_graph.= '<meta property="og:description" content="' . $meta_content . '" />'."\n";
-        $meta_open_graph.= '<meta property="og:type" content="article" />'."\n";
-        $meta_open_graph.= '<meta property="og:url" content="' . $h->url(array('page'=>$h->post->id)) . '" />'."\n";
-        $meta_open_graph.= '<meta property="og:site_name" content="' . SITE_NAME . '" />';
+        if ($h->pageType != 'post' || $h->post->status == 'pending' || $h->post->status == 'buried') { return false; }
         
-        // prüfen ob image multi upload aktiviert ist
+        $hseo_settings = $h->getSerializedSettings();
+        $open_graph = $hseo_settings['hseo_post_opengraph'];
+        if ($open_graph == true) {
+            $meta_content = sanitize($h->post->content, 'all');
+            $meta_content = truncate($meta_content, 100);
+            $meta_content = preg_replace('/(\\x0D|\\x0A|\\x0D\\x0A){2,}/','',$meta_content);
+            $meta_open_graph = '<meta property="og:title" content="' . $h->getTitle(true) . '" />'."\n";
+            $meta_open_graph.= '<meta property="og:description" content="' . $meta_content . '" />'."\n";
+            $meta_open_graph.= '<meta property="og:type" content="article" />'."\n";
+            $meta_open_graph.= '<meta property="og:url" content="' . $h->url(array('page'=>$h->post->id)) . '" />'."\n";
+            $meta_open_graph.= '<meta property="og:site_name" content="' . SITE_NAME . '" />'."\n";
+            
+            return $meta_open_graph;
+        }
+
+           // prüfen ob image multi upload aktiviert ist
 //        if ($h->isActive('ImageMultiUpload')) { 
 //            $meta_open_graph.= $this->open_graph_image($h);
 //        }
-        
-        return $meta_open_graph;
+             
     }
     
     
     
  /**
- * 
+ *  TODO - noch nicht implementiert
  *
  * @param 
  * @param 
@@ -289,9 +370,8 @@ private function meta_robots($h, $cache = true, $index = true, $follow = true) {
     }
     
     protected function license($h) {
-//        if (!isset($h->lang["hseo_license"])) { return false;}
         if ( $h->lang["hseo_license"] == "<!-- This page was optimized by hSEO / http://www.trendkraft.de / http://goo.gl/lFZpt -->") {
-            return $h->lang["hseo_license"];
+            return $h->lang["hseo_license"]."\n";
         }
         return false;
     }
@@ -305,7 +385,7 @@ private function meta_robots($h, $cache = true, $index = true, $follow = true) {
  * @param 
  * @return 
  */ 
-    public function hseo_leverage_browser_caching($h) {
+    public function hseo_leverage_browser_caching() {
         
         //Expires Headers und Browser Cache manipulation
         $maxAge = 60*60*24*14; // max. Cache-Dauer in Sekunden
@@ -339,6 +419,94 @@ private function meta_robots($h, $cache = true, $index = true, $follow = true) {
                     }
              }      
                     return;
+        }
+        
+        
+        
+/**
+ * 
+ *
+ * @param 
+ * @param 
+ * @return 
+ */ 
+    private function static_pages($h) {
+        
+        // Mit den folgenden Zeilen lassen sich
+        // alle Dateien in einem Verzeichnis auslesen
+        $handle=opendir (".");
+        echo "Verzeichnisinhalt:<br>";
+        while ($datei = readdir ($handle)) {
+         echo "$datei<br>";
+        }
+        closedir($handle);
+        
+            //Das auszulesende Verzeichnis
+            $dir = ".";
+
+            //Das Ziel-Array
+            $file_array = Array();
+
+            //Wenn das Verzeichnis existiert...
+            if(is_dir($dir))    {
+                //...öffne das Verzeichnis
+                $handle = opendir($dir);
+                //Wenn das Verzeichnis geöffnet werden konnte...
+                if(is_resource($handle))    {
+                    //...lese die enthaltenen Dateien aus,...
+                    while($file = readdir($handle))    {
+                        //...prüfe ob es Directory-Verweise sind...
+                        if($file != "." && $file != "..")
+                            //...und schreibe sie in das Ziel-Array
+                            array_push($file_array, $file);
+                    }
+                }else{
+                    echo "Das &Ouml;ffnen des Verzeichnisses ist fehlgeschlagen";
+                }
+            }else{
+                echo "Das Verzeichnis existiert nicht";
+            }
+            //Zum Schluss wird das Array ausgegeben
+            print_r($file_array);
+        
+        $h->getPageName($h);
+        
+        
+            //Das auszulesende Verzeichnis
+    $dir = ".";
+
+    //Das Ziel-Array
+    $file_array = Array();
+
+    //Wenn das Verzeichnis existiert...
+    if(is_dir($dir))    {
+        //...öffne das Verzeichnis
+        $handle = opendir($dir);
+        //Wenn das Verzeichnis geöffnet werden konnte...
+        if(is_resource($handle))    {
+            //...lese die enthaltenen Dateien aus,...
+            while($file = readdir($handle))    {
+                //...prüfe ob es Directory-Verweise sind...
+                if($file != "." && $file != "..")
+                    //...und schreibe sie in das Ziel-Array
+                    array_push($file_array, $file);
+            }
+        }else{
+            echo "Das &Ouml;ffnen des Verzeichnisses ist fehlgeschlagen";
+        }
+    }else{
+        echo "Das Verzeichnis existiert nicht";
+    }
+    //Zum Schluss wird das Array ausgegeben
+    print_r($file_array);
+        
+
+//        if ($h->isPage('faq'))
+//{
+//    // do something
+//}  
+//$page = $h->cage->get->testPage('page');
+//                    return;
         }
 }
 ?>

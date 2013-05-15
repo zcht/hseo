@@ -2,12 +2,11 @@
 /**
  * name: hSEO
  * description: swiss knife for hotaru seo. with innovations from germany.
- * version: 0.2
+ * version: 0.4
  * folder: hseo
  * class: hSEO
- * extends: tags
  * type: toolbox
- * hooks: install_plugin, admin_sidebar_plugin_settings, admin_plugin_settings, header_meta, theme_index_top
+ * hooks: install_plugin, admin_sidebar_plugin_settings, admin_plugin_settings, admin_header_include_raw, header_meta, theme_index_top
  * author: Andreas Votteler
  * authorurl: http://www.trendkraft.de
  *
@@ -35,7 +34,7 @@
 
 class hSEO
 {             
-    
+ 
     /**
     * 
     *
@@ -48,6 +47,11 @@ class hSEO
         
         $hseo_settings = $h->getSerializedSettings();
         
+        if (!isset($hseo_settings['hseo_home_canonical'])) { $hseo_settings['hseo_home_canonical'] = 'checked'; }
+        if (!isset($hseo_settings['hseo_home_cache'])) { $hseo_settings['hseo_home_cache'] = ''; }
+        if (!isset($hseo_settings['hseo_home_index'])) { $hseo_settings['hseo_home_index'] = 'checked'; }
+        if (!isset($hseo_settings['hseo_home_follow'])) { $hseo_settings['hseo_home_follow'] = 'checked'; }
+        
         if (!isset($hseo_settings['hseo_post_title'])) { $hseo_settings['hseo_post_title'] = 'checked'; }
         if (!isset($hseo_settings['hseo_post_description'])) { $hseo_settings['hseo_post_description'] = 'checked'; }
         if (!isset($hseo_settings['hseo_post_keywords'])) { $hseo_settings['hseo_post_keywords'] = 'checked'; }
@@ -56,6 +60,31 @@ class hSEO
         if (!isset($hseo_settings['hseo_post_follow'])) { $hseo_settings['hseo_post_follow'] = 'checked'; }
         if (!isset($hseo_settings['hseo_post_index'])) { $hseo_settings['hseo_post_index'] = 'checked'; }        
         if (!isset($hseo_settings['hseo_post_opengraph'])) { $hseo_settings['hseo_post_opengraph'] = 'checked'; }
+        
+
+        
+        $staticpages = $this->static_pages($h);
+//        $f = new hSEOSettings($h); //not work
+//        $staticpages = $f->static_pages($h);
+            
+        foreach($staticpages as $currentKey ) {
+            if (!isset($hseo_settings['hseo_staticpage_title_'.$currentKey])) { $hseo_settings['hseo_staticpage_title_'.$currentKey] = 'checked'; }
+            if (!isset($hseo_settings['hseo_staticpage_description_'.$currentKey])) { $hseo_settings['hseo_staticpage_title_'.$currentKey] = 'checked'; }
+            if (!isset($hseo_settings['hseo_staticpage_keywords_'.$currentKey])) { $hseo_settings['hseo_staticpage_title_'.$currentKey] = 'checked'; }
+            if (!isset($hseo_settings['hseo_staticpage_canonical_'.$currentKey])) { $hseo_settings['hseo_staticpage_title_'.$currentKey] = 'checked'; }        
+            if (!isset($hseo_settings['hseo_staticpage_cache_'.$currentKey])) { $hseo_settings['hseo_staticpage_title_'.$currentKey] = ''; }
+            if (!isset($hseo_settings['hseo_staticpage_follow_'.$currentKey])) { $hseo_settings['hseo_staticpage_title_'.$currentKey] = 'checked'; }
+            if (!isset($hseo_settings['hseo_staticpage_index_'.$currentKey])) { $hseo_settings['hseo_staticpage_title_'.$currentKey] = 'checked'; }        
+            if (!isset($hseo_settings['hseo_staticpage_opengraph_'.$currentKey])) { $hseo_settings['hseo_staticpage_title_'.$currentKey] = 'checked'; }
+            
+//            if (!isset($hseo_settings['hseo_staticpage_title_data_'.$currentKey])) { $hseo_settings['hseo_staticpage_title_data_'.$currentKey] = ''; }
+//            if (!isset($hseo_settings['hseo_staticpage_description_data_'.$currentKey])) { $hseo_settings['hseo_staticpage_description_data_'.$currentKey] = ''; }
+//            if (!isset($hseo_settings['hseo_staticpage_keywords_data_'.$currentKey])) { $hseo_settings['hseo_staticpage_keywords_data_'.$currentKey] = ''; }
+            
+            if (!$h->getSetting($hseo_settings['hseo_staticpage_title_data_'.$currentKey])) { $h->updateSetting($hseo_settings['hseo_staticpage_title_data_'.$currentKey], ''); }
+            if (!$h->getSetting($hseo_settings['hseo_staticpage_description_data_'.$currentKey])) { $h->updateSetting($hseo_settings['hseo_staticpage_description_data_'.$currentKey], ''); }
+            if (!$h->getSetting($hseo_settings['hseo_staticpage_keywords_data_'.$currentKey])) { $h->updateSetting($hseo_settings['hseo_staticpage_keywords_data_'.$currentKey], ''); }
+           } 
         
         $h->updateSetting('hseo_settings', serialize($hseo_settings));
     }
@@ -87,12 +116,81 @@ class hSEO
         {    
             require_once(PLUGINS . 'hseo/libs/hSEOFunctions.php');
             $f = new hSEO_Functions($h);
-            
             $f->hseo_post_redirect($h);
             $f->getmeta($h);
            
         }
 
-}
+        
+    /**
+    * 
+    *
+    * @param 
+    * @param 
+    * @return 
+    */ 
+    public function admin_header_include_raw($h)
+    {
+        if ($h->isSettingsPage('hseo')) {
+            echo '<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-tooltip.js"></script>'."\n";
+            echo "<script type='text/javascript'>
+                    $(document).ready(function () {
+                    if ($(\"[rel=tooltip]\").length) {
+                    $(\"[rel=tooltip]\").tooltip();
+                    }
+                  });
+                 </script>";
+        }
+    }
+   
+    
+    
+    public function static_pages($h){
 
+        $themes = $h->getFiles(THEMES, array('404error.php'));
+        if ($themes) {
+                $themes = sksort($themes, $subkey="name", $type="char", true);
+                foreach ($themes as $theme) { 
+                        if ($theme == rtrim(THEME, '/')) {
+                                $dir = THEMES . THEME;
+                               // print_r($dir);
+                        }
+                }
+        }
+
+         //Das Ziel-Array
+        $file_array = Array();
+        $denied_staticpage = array( '404error', 'header', 'index', 'footer', 'sidebar', 'navigation', 'settings', 'support', 'bookmarking_sort_filter');  
+                
+        //Wenn das Verzeichnis existiert...
+        if(is_dir($dir))    {
+            //...öffne das Verzeichnis
+            $handle = opendir($dir);
+            //Wenn das Verzeichnis geöffnet werden konnte...
+            if(is_resource($handle))    {
+                //...lese die enthaltenen Dateien aus,...
+                while($file = readdir($handle))    {
+                    //...prüfe ob es Directory-Verweise sind...
+                    if($file != "." && $file != "..")
+                        //...und schreibe sie in das Ziel-Array
+                        $filename = pathinfo($dir."/" .$file);
+                        if (@$filename['extension'] == "php") { // @ fehler unterdrücken
+                            array_push($file_array, $filename['filename']);
+                        }
+                }
+            }else{
+                echo "Das &Ouml;ffnen des Verzeichnisses ist fehlgeschlagen";
+            }
+        }else{
+            echo "Das Verzeichnis existiert nicht";
+        }
+        //Zum Schluss wird das Array ausgegeben
+//        print_r($file_array);
+        $file_array = array_diff($file_array, $denied_staticpage);
+        return $file_array;
+        
+    }
+    
+    
+}
 ?>
