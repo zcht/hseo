@@ -61,11 +61,8 @@ class hSEO
         if (!isset($hseo_settings['hseo_post_index'])) { $hseo_settings['hseo_post_index'] = 'checked'; }        
         if (!isset($hseo_settings['hseo_post_opengraph'])) { $hseo_settings['hseo_post_opengraph'] = 'checked'; }
         
-
-        
+     
         $staticpages = $this->static_pages($h);
-//        $f = new hSEOSettings($h); //not work
-//        $staticpages = $f->static_pages($h);
             
         foreach($staticpages as $currentKey ) {
             if (!isset($hseo_settings['hseo_staticpage_title_'.$currentKey])) { $hseo_settings['hseo_staticpage_title_'.$currentKey] = 'checked'; }
@@ -76,11 +73,7 @@ class hSEO
             if (!isset($hseo_settings['hseo_staticpage_follow_'.$currentKey])) { $hseo_settings['hseo_staticpage_title_'.$currentKey] = 'checked'; }
             if (!isset($hseo_settings['hseo_staticpage_index_'.$currentKey])) { $hseo_settings['hseo_staticpage_title_'.$currentKey] = 'checked'; }        
             if (!isset($hseo_settings['hseo_staticpage_opengraph_'.$currentKey])) { $hseo_settings['hseo_staticpage_title_'.$currentKey] = 'checked'; }
-            
-//            if (!isset($hseo_settings['hseo_staticpage_title_data_'.$currentKey])) { $hseo_settings['hseo_staticpage_title_data_'.$currentKey] = ''; }
-//            if (!isset($hseo_settings['hseo_staticpage_description_data_'.$currentKey])) { $hseo_settings['hseo_staticpage_description_data_'.$currentKey] = ''; }
-//            if (!isset($hseo_settings['hseo_staticpage_keywords_data_'.$currentKey])) { $hseo_settings['hseo_staticpage_keywords_data_'.$currentKey] = ''; }
-            
+
             if (!$h->getSetting($hseo_settings['hseo_staticpage_title_data_'.$currentKey])) { $h->updateSetting($hseo_settings['hseo_staticpage_title_data_'.$currentKey], ''); }
             if (!$h->getSetting($hseo_settings['hseo_staticpage_description_data_'.$currentKey])) { $h->updateSetting($hseo_settings['hseo_staticpage_description_data_'.$currentKey], ''); }
             if (!$h->getSetting($hseo_settings['hseo_staticpage_keywords_data_'.$currentKey])) { $h->updateSetting($hseo_settings['hseo_staticpage_keywords_data_'.$currentKey], ''); }
@@ -132,7 +125,9 @@ class hSEO
     public function admin_header_include_raw($h)
     {
         if ($h->isSettingsPage('hseo')) {
-            //echo '<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-tooltip.js"></script>'."\n";
+            // bootstrap is now standard with core in v.1.5.0
+            // you can remove line below after v.1.5.0 release
+            echo '<script src="http://twitter.github.com/bootstrap/assets/js/bootstrap-tooltip.js"></script>'."\n";
             echo "<script type='text/javascript'>
                     $(document).ready(function () {
                     if ($(\"[rel=tooltip]\").length) {
@@ -150,6 +145,7 @@ class hSEO
 
     public function admin_plugin_tabContent_pre_first($h)
     {                                    
+            $staticpages = $this->static_pages($h);
             echo '<div class="tab-pane" id="editmeta">';     
                 include('templates/hseo_editmeta.php');
             echo '</div>';
@@ -160,21 +156,21 @@ class hSEO
     */
     public function admin_plugin_support($h)
     {
-            echo "<p>You can see Example on www.trendkraft.de</p>";
+            echo "<p>You can see Example on <a href='http://www.trendkraft.de'>www.trendkraft.de</a></p>";
     }  
     
     
     public function static_pages($h){
 
         $themes = $h->getFiles(THEMES, array('404error.php'));
-        if ($themes) {
-                $themes = sksort($themes, $subkey="name", $type="char", true);
-                foreach ($themes as $theme) { 
-                        if ($theme == rtrim(THEME, '/')) {
-                                $dir = THEMES . THEME;
-                               // print_r($dir);
-                        }
-                }
+        if (is_array($themes)) {
+            if (array_search(rtrim(THEME, '/'), $themes)) $dir = THEMES . THEME;
+//                foreach ($themes as $theme) { 
+//                        if ($theme == rtrim(THEME, '/')) {
+//                                $dir = THEMES . THEME;
+//                               // print_r($dir);
+//                        }
+//                }
         }
 
          //Das Ziel-Array

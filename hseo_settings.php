@@ -25,7 +25,7 @@
  * @link      http://www.hotarucms.org/
  */
  
-class hSEOSettings
+class hSEOSettings extends hSEO
 {
 
      /**
@@ -60,15 +60,15 @@ class hSEOSettings
         $hseo_post_opengraph = $hseo_settings['hseo_post_opengraph'];        
 
         foreach($staticpages as $currentKey ) { 
-            $hseo_staticpage_title[$currentKey] = $hseo_settings['hseo_staticpage_title_'.$currentKey];
-            $hseo_staticpage_description[$currentKey] = $hseo_settings['hseo_staticpage_description_'.$currentKey];
-            $hseo_staticpage_keywords[$currentKey] = $hseo_settings['hseo_staticpage_keywords_'.$currentKey];
-            $hseo_staticpage_canonical[$currentKey] = $hseo_settings['hseo_staticpage_canonical_'.$currentKey];
-            $hseo_staticpage_cache[$currentKey] = $hseo_settings['hseo_staticpage_cache_'.$currentKey];
-            $hseo_staticpage_follow[$currentKey] = $hseo_settings['hseo_staticpage_follow_'.$currentKey];
-            $hseo_staticpage_index[$currentKey] = $hseo_settings['hseo_staticpage_index_'.$currentKey];
-            $hseo_staticpage_opengraph[$currentKey] = $hseo_settings['hseo_staticpage_opengraph_'.$currentKey];            
-            $hseo_staticpage_title_data[$currentKey] = $hseo_settings['hseo_staticpage_title_data_'.$currentKey];
+            $hseo_staticpage_title[$currentKey] = isset($hseo_settings['hseo_staticpage_title_'.$currentKey]) ? $hseo_settings['hseo_staticpage_title_'.$currentKey] : '';
+            $hseo_staticpage_description[$currentKey] = isset($hseo_settings['hseo_staticpage_description_'.$currentKey]) ? $hseo_settings['hseo_staticpage_description_'.$currentKey] : '';
+            $hseo_staticpage_keywords[$currentKey] = isset($hseo_settings['hseo_staticpage_keywords_'.$currentKey]) ? $hseo_settings['hseo_staticpage_keywords_'.$currentKey] : '';
+            $hseo_staticpage_canonical[$currentKey] = isset($hseo_settings['hseo_staticpage_canonical_'.$currentKey]) ? $hseo_settings['hseo_staticpage_canonical_'.$currentKey] : '';
+            $hseo_staticpage_cache[$currentKey] = isset($hseo_settings['hseo_staticpage_cache_'.$currentKey]) ? $hseo_settings['hseo_staticpage_cache_'.$currentKey] : '';
+            $hseo_staticpage_follow[$currentKey] = isset($hseo_settings['hseo_staticpage_follow_'.$currentKey]) ? $hseo_settings['hseo_staticpage_follow_'.$currentKey] : '';
+            $hseo_staticpage_index[$currentKey] = isset($hseo_settings['hseo_staticpage_index_'.$currentKey]) ? $hseo_settings['hseo_staticpage_index_'.$currentKey] : '';
+            $hseo_staticpage_opengraph[$currentKey] = isset($hseo_settings['hseo_staticpage_opengraph_'.$currentKey]) ? $hseo_settings['hseo_staticpage_opengraph_'.$currentKey] : '';            
+            $hseo_staticpage_title_data[$currentKey] = isset($hseo_settings['hseo_staticpage_title_data_'.$currentKey]) ? $hseo_settings['hseo_staticpage_title_data_'.$currentKey] : '';
         } 
         
         $h->pluginHook('hseo_settings_get_values');
@@ -264,11 +264,7 @@ class hSEOSettings
         
         }
    
-        
-        
-        
-        
-        
+                
         $h->pluginHook('hseo_save_settings');
         
         if ($error == 0) {
@@ -313,52 +309,6 @@ class hSEOSettings
     }
     
     
-    
-    public function static_pages($h){
-
-        $themes = $h->getFiles(THEMES, array('404error.php'));
-        if ($themes) {
-                $themes = sksort($themes, $subkey="name", $type="char", true);
-                foreach ($themes as $theme) { 
-                        if ($theme == rtrim(THEME, '/')) {
-                                $dir = THEMES . THEME;
-                               // print_r($dir);
-                        }
-                }
-        }
-
-         //Das Ziel-Array
-        $file_array = Array();
-        $denied_staticpage = array( '404error', 'header', 'index', 'footer', 'sidebar', 'navigation', 'settings', 'support', 'bookmarking_sort_filter');  
-                
-        //Wenn das Verzeichnis existiert...
-        if(is_dir($dir))    {
-            //...öffne das Verzeichnis
-            $handle = opendir($dir);
-            //Wenn das Verzeichnis geöffnet werden konnte...
-            if(is_resource($handle))    {
-                //...lese die enthaltenen Dateien aus,...
-                while($file = readdir($handle))    {
-                    //...prüfe ob es Directory-Verweise sind...
-                    if($file != "." && $file != "..")
-                        //...und schreibe sie in das Ziel-Array
-                        $filename = pathinfo($dir."/" .$file);
-                        if (@$filename['extension'] == "php") { // @ fehler unterdrücken
-                            array_push($file_array, $filename['filename']);
-                        }
-                }
-            }else{
-                echo "Das &Ouml;ffnen des Verzeichnisses ist fehlgeschlagen";
-            }
-        }else{
-            echo "Das Verzeichnis existiert nicht";
-        }
-        //Zum Schluss wird das Array ausgegeben
-//        print_r($file_array);
-        $file_array = array_diff($file_array, $denied_staticpage);
-        return $file_array;
-        
-    }
     
 }
 ?>
