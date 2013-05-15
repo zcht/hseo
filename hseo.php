@@ -32,9 +32,16 @@
  * @link      http://www.hotarucms.org/
  */
 
+// security
+if (!class_exists('hSEO')) {
+	die();
+}
+
 class hSEO
 {             
  
+
+
     /**
     * 
     *
@@ -175,7 +182,7 @@ class hSEO
 
          //Das Ziel-Array
         $file_array = Array();
-        $denied_staticpage = array( '404error', 'header', 'index', 'footer', 'sidebar', 'navigation', 'settings', 'support', 'bookmarking_sort_filter');  
+        $denied_staticpage = array( '404error', 'header', 'index', 'footer', 'sidebar', 'navigation', 'settings', 'support', 'bookmarking_sort_filter', 'all', 'popular', 'upcoming', 'latest', 'pluginsdisabled', '', '', '', '');  
                 
         //Wenn das Verzeichnis existiert...
         if(is_dir($dir))    {

@@ -256,7 +256,7 @@ class hSEOSettings extends hSEO
         }
         
         // static pages title, description and keywords input
-        if ($h->cage->post->keyExists('hseo_staticpage_title_data_'.$currentKey)) { 
+        if ($h->cage->post->keyExists('hseo_staticpage_title_'.$currentKey)) { 
              $hseo_staticpage_title_data[$currentKey] = $h->cage->post->testAlnumLines('hseo_staticpage_title_data_'.$currentKey);
         } else {
             $hseo_staticpage_title_data[$currentKey] = '';

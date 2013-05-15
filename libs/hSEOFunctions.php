@@ -27,7 +27,7 @@
 class hSEO_Functions
 {
 
-    function __construct($h, $meta = null) {
+    function __construct($h) {
         $this->meta = array(
             'license' =>  $this->license($h),
             'title' => $this->meta_title($h),
@@ -82,7 +82,13 @@ class hSEO_Functions
        }
        
        if ($h->cage->get->testPage('page')) {
-           $title = $hseo_settings['hseo_staticpage_title_'.$h->cage->get->testPage('page')];
+           print_r($hseo_settings['hseo_staticpage_title_data_'.$h->cage->get->testPage('page')]);
+           
+           if ($hseo_settings['hseo_staticpage_title_'.$h->cage->get->testPage('page')]) {
+                $title = $hseo_settings['hseo_staticpage_title_data_'.$h->cage->get->testPage('page')];
+                
+           print_r($title);
+           }
         }
        
        if ($title == true) {

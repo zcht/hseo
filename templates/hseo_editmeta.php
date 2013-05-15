@@ -19,7 +19,7 @@ echo "<form name='hseo_settings_form' action='" . BASEURL . "admin_index.php?pag
                     <tr>
                         <td>Title: </td>
                         <td>
-                            <input  type='text' name="hseo_staticpage_title_data_<?php echo $currentKey; ?>" value='<?php echo $hseo_staticpage_title_data[$currentKey]; ?>' >
+                            <input  type='text' name="hseo_staticpage_title_data_<?php echo $currentKey; ?>" value='<?php echo @$hseo_staticpage_title_data[$currentKey]; ?>' >
                         </td>
                     </tr>
                     <tr>
