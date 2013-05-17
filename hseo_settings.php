@@ -38,10 +38,6 @@ class hSEOSettings extends hSEO
             $this->saveSettings($h); 
         }
         
-        //  array of static pages
-        $staticpages = $this->static_pages($h);
-        //print_r($staticpages);
-        
         // Get settings from database if they exist...
         $hseo_settings = $h->getSerializedSettings();
 
@@ -59,6 +55,10 @@ class hSEOSettings extends hSEO
         $hseo_post_index = $hseo_settings['hseo_post_index'];
         $hseo_post_opengraph = $hseo_settings['hseo_post_opengraph'];        
 
+         //  array of static pages
+        $staticpages = $this->static_pages($h);
+        //print_r($staticpages);
+        
         foreach($staticpages as $currentKey ) { 
             $hseo_staticpage_title[$currentKey] = isset($hseo_settings['hseo_staticpage_title_'.$currentKey]) ? $hseo_settings['hseo_staticpage_title_'.$currentKey] : '';
             $hseo_staticpage_description[$currentKey] = isset($hseo_settings['hseo_staticpage_description_'.$currentKey]) ? $hseo_settings['hseo_staticpage_description_'.$currentKey] : '';
@@ -67,8 +67,10 @@ class hSEOSettings extends hSEO
             $hseo_staticpage_cache[$currentKey] = isset($hseo_settings['hseo_staticpage_cache_'.$currentKey]) ? $hseo_settings['hseo_staticpage_cache_'.$currentKey] : '';
             $hseo_staticpage_follow[$currentKey] = isset($hseo_settings['hseo_staticpage_follow_'.$currentKey]) ? $hseo_settings['hseo_staticpage_follow_'.$currentKey] : '';
             $hseo_staticpage_index[$currentKey] = isset($hseo_settings['hseo_staticpage_index_'.$currentKey]) ? $hseo_settings['hseo_staticpage_index_'.$currentKey] : '';
-            $hseo_staticpage_opengraph[$currentKey] = isset($hseo_settings['hseo_staticpage_opengraph_'.$currentKey]) ? $hseo_settings['hseo_staticpage_opengraph_'.$currentKey] : '';            
+            $hseo_staticpage_opengraph[$currentKey] = isset($hseo_settings['hseo_staticpage_opengraph_'.$currentKey]) ? $hseo_settings['hseo_staticpage_opengraph_'.$currentKey] : '';
+            
             $hseo_staticpage_title_data[$currentKey] = isset($hseo_settings['hseo_staticpage_title_data_'.$currentKey]) ? $hseo_settings['hseo_staticpage_title_data_'.$currentKey] : '';
+       
         } 
         
         $h->pluginHook('hseo_settings_get_values');
@@ -97,13 +99,15 @@ class hSEOSettings extends hSEO
              if (!$hseo_staticpage_cache[$currentKey]) { $hseo_staticpage_cache[$currentKey] = ''; }
              if (!$hseo_staticpage_follow[$currentKey]) { $hseo_staticpage_follow[$currentKey] = ''; }
              if (!$hseo_staticpage_index[$currentKey]) { $hseo_staticpage_index[$currentKey] = ''; }
-             if (!$hseo_staticpage_opengraph[$currentKey]) { $hseo_staticpage_opengraph[$currentKey] = ''; }                
-             if (!$hseo_staticpage_title_data[$currentKey]) { $hseo_staticpage_title_data[$currentKey] = ''; }                 
+             if (!$hseo_staticpage_opengraph[$currentKey]) { $hseo_staticpage_opengraph[$currentKey] = ''; }  
+             
+             if (!$hseo_staticpage_title_data[$currentKey]) { $hseo_staticpage_title_data[$currentKey] = ''; } 
+             
         } 
         
-        echo "<form name='hseo_settings_form' action='" . BASEURL . "admin_index.php?page=plugin_settings&amp;plugin=hseo#tab_settings' method='post'>\n";
+        echo "<form name='hseo_settings_form' action='" . BASEURL . "admin_index.php?page=plugin_settings&amp;plugin=hseo' method='post'>\n";
         
-        include('templates/hseo_metatable.php');
+        include('templates/hseo_settings.php');
         
         $h->pluginHook('hseo_settings_form');
                 
@@ -256,14 +260,17 @@ class hSEOSettings extends hSEO
         }
         
         // static pages title, description and keywords input
-        if ($h->cage->post->keyExists('hseo_staticpage_title_'.$currentKey)) { 
+        // http://localhost/tkdev/admin_index.php?page=plugin_settings&plugin=hseo
+       // print_r($hseo_staticpage_title_data[$currentKey]);
+       if ($h->cage->post->keyExists('hseo_staticpage_title_data_'.$currentKey)) { 
              $hseo_staticpage_title_data[$currentKey] = $h->cage->post->testAlnumLines('hseo_staticpage_title_data_'.$currentKey);
         } else {
             $hseo_staticpage_title_data[$currentKey] = '';
         }
         
+        
+        
         }
-   
                 
         $h->pluginHook('hseo_save_settings');
         

@@ -24,7 +24,7 @@
  * @link      http://www.hotarucms.org/
  */
 
-class hSEO_Functions
+class hSEO_Functions// extends hSEO
 {
 
     function __construct($h) {
@@ -82,15 +82,28 @@ class hSEO_Functions
        }
        
        if ($h->cage->get->testPage('page')) {
-           print_r($hseo_settings['hseo_staticpage_title_data_'.$h->cage->get->testPage('page')]);
-           
-           if ($hseo_settings['hseo_staticpage_title_'.$h->cage->get->testPage('page')]) {
-                $title = $hseo_settings['hseo_staticpage_title_data_'.$h->cage->get->testPage('page')];
-                
-           print_r($title);
-           }
-        }
-       
+           $title = $hseo_settings['hseo_staticpage_title_'.$h->cage->get->testPage('page')];
+            if ($title == true) {
+               $staticpages = $this->static_pages($h);
+               foreach($staticpages as $currentKey) {
+                   if ($h->cage->get->testPage('page') == $currentKey) {
+                       $title = $hseo_settings['hseo_staticpage_title_data_'.$h->cage->get->testPage('page')];
+                       return "<title>". $title ."</title>"."\n";
+                       break;
+                   }
+               }
+            } 
+       }
+//           //print_r($hseo_settings['hseo_staticpage_title_data_'.$h->cage->get->testPage('page')]);
+//           
+//           if ($hseo_settings['hseo_staticpage_title_'.$h->cage->get->testPage('page')]) {
+//                $title = $hseo_settings['hseo_staticpage_title_data_'.$h->cage->get->testPage('page')];
+//                
+//           print_r($title);
+//           }
+//           
+//        }
+//       
        if ($title == true) {
             return "<title>". $h->getTitle() ."</title>"."\n";
        }
@@ -150,13 +163,26 @@ private function meta_robots($h, $cache = true, $index = true, $follow = true) {
         }
         
         // static pages
-        if ($h->cage->get->testPage('page')) {
-            $hseo_settings = $h->getSerializedSettings();
-            $cache = $hseo_settings['hseo_staticpage_cache_'.$h->cage->get->testPage('page')];
-            $follow = $hseo_settings['hseo_staticpage_follow_'.$h->cage->get->testPage('page')];
-            $index = $hseo_settings['hseo_staticpage_index_'.$h->cage->get->testPage('page')];
-        }
+//        if ($h->cage->get->testPage('page')) {
+//            $hseo_settings = $h->getSerializedSettings();
+//            $cache = $hseo_settings['hseo_staticpage_cache_'.$h->cage->get->testPage('page')];
+//            $follow = $hseo_settings['hseo_staticpage_follow_'.$h->cage->get->testPage('page')];
+//            $index = $hseo_settings['hseo_staticpage_index_'.$h->cage->get->testPage('page')];
+//        }
 
+        
+       if ($h->cage->get->testPage('page')) {
+               $staticpages = $this->static_pages($h);
+               foreach($staticpages as $currentKey) {
+                   if ($h->cage->get->testPage('page') == $currentKey) {
+                        $hseo_settings = $h->getSerializedSettings();
+                        $cache = $hseo_settings['hseo_staticpage_cache_'.$h->cage->get->testPage('page')];
+                        $follow = $hseo_settings['hseo_staticpage_follow_'.$h->cage->get->testPage('page')];
+                        $index = $hseo_settings['hseo_staticpage_index_'.$h->cage->get->testPage('page')];
+                       break;
+                   }
+               }
+            } 
         
         if ($cache == true) {
             $cache = "";
@@ -392,15 +418,15 @@ private function meta_robots($h, $cache = true, $index = true, $follow = true) {
  * @param 
  * @return 
  */ 
-    public function hseo_leverage_browser_caching() {
+    public function hseo_leverage_browser_caching($h) {
         
-        //Expires Headers und Browser Cache manipulation
-        $maxAge = 60*60*24*14; // max. Cache-Dauer in Sekunden
-        header('Expires: '.gmdate('D, d M Y H:i:s', time()+$maxAge).' GMT');
-        header("Last-Modified: ".gmdate("D, d M Y H:i:s",  time()) . " GMT");
-        header('Cache-Control: max-age='.$maxAge);
-        header("Pragma: no-cache");
-                    
+        if ($h->pageType == 'post' or $h->pageType == 'list' or $h->cage->get->testPage('page')) {  
+            $maxAge = 60*60*24*14; // max. Cache-Dauer in Sekunden
+            header('Expires: '.gmdate('D, d M Y H:i:s', time()+$maxAge).' GMT');
+            header("Last-Modified: ".gmdate("D, d M Y H:i:s",  time()) . " GMT");
+            header('Cache-Control: max-age='.$maxAge);
+            header("Pragma: no-cache");
+        }            
         return;
     }
    
@@ -428,8 +454,53 @@ private function meta_robots($h, $cache = true, $index = true, $follow = true) {
                     return;
         }
         
+public function static_pages($h){
+
+        $themes = $h->getFiles(THEMES, array('404error.php'));
+        if (is_array($themes)) {
+            if (array_search(rtrim(THEME, '/'), $themes)) $dir = THEMES . THEME;
+//                foreach ($themes as $theme) { 
+//                        if ($theme == rtrim(THEME, '/')) {
+//                                $dir = THEMES . THEME;
+//                               // print_r($dir);
+//                        }
+//                }
+        }
+
+         //Das Ziel-Array
+        $file_array = Array();
+        $denied_staticpage = array( '404error', 'header', 'index', 'footer', 'sidebar', 'navigation', 'settings', 'support', 'bookmarking_sort_filter', 'all', 'popular', 'upcoming', 'latest', 'pluginsdisabled', 'tag-cloud', '', '', '');  
+                
+        //Wenn das Verzeichnis existiert...
+        if(is_dir($dir))    {
+            //...öffne das Verzeichnis
+            $handle = opendir($dir);
+            //Wenn das Verzeichnis geöffnet werden konnte...
+            if(is_resource($handle))    {
+                //...lese die enthaltenen Dateien aus,...
+                while($file = readdir($handle))    {
+                    //...prüfe ob es Directory-Verweise sind...
+                    if($file != "." && $file != "..")
+                        //...und schreibe sie in das Ziel-Array
+                        $filename = pathinfo($dir."/" .$file);
+                        if (@$filename['extension'] == "php") { // @ fehler unterdrücken
+                            array_push($file_array, $filename['filename']);
+                        }
+                }
+            }else{
+                echo "Das &Ouml;ffnen des Verzeichnisses ist fehlgeschlagen";
+            }
+        }else{
+            echo "Das Verzeichnis existiert nicht";
+        }
+        //Zum Schluss wird das Array ausgegeben
+//        print_r($file_array);
+        $file_array = array_diff($file_array, $denied_staticpage);
+        return $file_array;
         
-        
+    }
+    
+    
 /**
  * 
  *
@@ -437,7 +508,7 @@ private function meta_robots($h, $cache = true, $index = true, $follow = true) {
  * @param 
  * @return 
  */ 
-    private function static_pages($h) {
+    private function statictest_pages($h) {
         
         // Mit den folgenden Zeilen lassen sich
         // alle Dateien in einem Verzeichnis auslesen
