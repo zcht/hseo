@@ -108,8 +108,8 @@
                 <ul>
                     <?php print_r($hseo_staticpage_title_data[$currentKey]); ?>
                     <li><label>Title:</label><input  type='text' size='300' name="hseo_staticpage_title_data_<?php echo $currentKey; ?>" value="<?php echo $hseo_staticpage_title_data[$currentKey]; ?>" ></li>
-                    <li><label>Description:</label><input  type='text' size='300' name="hseo_staticpage_description_data_<?php echo $currentKey; ?>" value="<?php //echo 'hseo_staticpage_description_data_'.$currentKey; ?>"></li>
-                    <li><label>Keywords:</label><input  type='text' size='300' name="hseo_staticpage_keywords_data_<?php echo $currentKey; ?>" value="<?php //echo 'hseo_staticpage_keywords_data_'.$currentKey;  ?>"'></li>
+                    <li><label>Description:</label><input  type='text' size='300' name="hseo_staticpage_description_data_<?php echo $currentKey; ?>" value="<?php echo $hseo_staticpage_description_data[$currentKey]; ?>" ></li>
+                    <li><label>Keywords:</label><input  type='text' size='300' name="hseo_staticpage_keywords_data_<?php echo $currentKey; ?>" value="<?php echo $hseo_staticpage_keywords_data[$currentKey]; ?>" ></li>
                 </ul>
             </td>
         </tr>
