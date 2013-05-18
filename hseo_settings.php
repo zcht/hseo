@@ -27,7 +27,23 @@
  
 class hSEOSettings extends hSEO
 {
+    
+    // home, post   
+    private $checkedItems = array('hseo_home_canonical', 'hseo_home_cache', 'hseo_home_index', 'hseo_home_follow',
+                                'hseo_post_title', 'hseo_post_description', 'hseo_post_keywords', 'hseo_post_canonical',
+                                'hseo_post_cache', 'hseo_post_follow', 'hseo_post_index', 'hseo_post_opengraph', 
+                            );
+    
+    // static pages
+    private $checkedPagesItems = array('hseo_staticpage_title', 'hseo_staticpage_description', 'hseo_staticpage_keywords',
+                            'hseo_staticpage_canonical', 'hseo_staticpage_cache', 'hseo_staticpage_follow',
+                            'hseo_staticpage_index', 'hseo_staticpage_opengraph'            
+                        );
 
+    // static pages title, description and keywords input
+    private $textItems = array('hseo_staticpage_title_data', 'hseo_staticpage_description_data', 'hseo_staticpage_keywords_data');
+
+        
      /**
      * Admin settings for hseo
      */
@@ -40,71 +56,31 @@ class hSEOSettings extends hSEO
         
         // Get settings from database if they exist...
         $hseo_settings = $h->getSerializedSettings();
-
-        $hseo_home_canonical = $hseo_settings['hseo_home_canonical'];
-        $hseo_home_cache = $hseo_settings['hseo_home_cache'];
-        $hseo_home_index = $hseo_settings['hseo_home_index'];
-        $hseo_home_follow = $hseo_settings['hseo_home_follow'];
         
-        $hseo_post_title = $hseo_settings['hseo_post_title'];
-        $hseo_post_description = $hseo_settings['hseo_post_description'];
-        $hseo_post_keywords = $hseo_settings['hseo_post_keywords'];
-        $hseo_post_canonical = $hseo_settings['hseo_post_canonical'];
-        $hseo_post_cache = $hseo_settings['hseo_post_cache'];
-        $hseo_post_follow = $hseo_settings['hseo_post_follow'];
-        $hseo_post_index = $hseo_settings['hseo_post_index'];
-        $hseo_post_opengraph = $hseo_settings['hseo_post_opengraph'];        
-
-         //  array of static pages
+        // post, home
+        foreach ($this->checkedItems as $item) {
+            $$item = isset($hseo_settings[$item]) ? $hseo_settings[$item] : '';
+        } 
+       
+         // array of static pages
         $staticpages = $this->static_pages($h);
         //print_r($staticpages);
         
+        // static pages
         foreach($staticpages as $currentKey ) { 
-            $hseo_staticpage_title[$currentKey] = isset($hseo_settings['hseo_staticpage_title_'.$currentKey]) ? $hseo_settings['hseo_staticpage_title_'.$currentKey] : '';
-            $hseo_staticpage_description[$currentKey] = isset($hseo_settings['hseo_staticpage_description_'.$currentKey]) ? $hseo_settings['hseo_staticpage_description_'.$currentKey] : '';
-            $hseo_staticpage_keywords[$currentKey] = isset($hseo_settings['hseo_staticpage_keywords_'.$currentKey]) ? $hseo_settings['hseo_staticpage_keywords_'.$currentKey] : '';
-            $hseo_staticpage_canonical[$currentKey] = isset($hseo_settings['hseo_staticpage_canonical_'.$currentKey]) ? $hseo_settings['hseo_staticpage_canonical_'.$currentKey] : '';
-            $hseo_staticpage_cache[$currentKey] = isset($hseo_settings['hseo_staticpage_cache_'.$currentKey]) ? $hseo_settings['hseo_staticpage_cache_'.$currentKey] : '';
-            $hseo_staticpage_follow[$currentKey] = isset($hseo_settings['hseo_staticpage_follow_'.$currentKey]) ? $hseo_settings['hseo_staticpage_follow_'.$currentKey] : '';
-            $hseo_staticpage_index[$currentKey] = isset($hseo_settings['hseo_staticpage_index_'.$currentKey]) ? $hseo_settings['hseo_staticpage_index_'.$currentKey] : '';
-            $hseo_staticpage_opengraph[$currentKey] = isset($hseo_settings['hseo_staticpage_opengraph_'.$currentKey]) ? $hseo_settings['hseo_staticpage_opengraph_'.$currentKey] : '';
+            foreach ($this->checkedPagesItems as $item) {                
+                ${$item}[$currentKey] = isset($hseo_settings[$item . '_' . $currentKey]) ? $hseo_settings[$item . '_' . $currentKey] : '';                
+            } 
             
-            $hseo_staticpage_title_data[$currentKey] = isset($hseo_settings['hseo_staticpage_title_data_'.$currentKey]) ? $hseo_settings['hseo_staticpage_title_data_'.$currentKey] : '';
-       
+            foreach ($this->textItems as $item) {                
+                ${$item}[$currentKey] = isset($hseo_settings[$item . '_' . $currentKey]) ? $hseo_settings[$item . '_' . $currentKey] : '';                
+            } 
         } 
         
+        // hook in case another plugin wants to populate the values
         $h->pluginHook('hseo_settings_get_values');
-        
-        
-        //...otherwise set to blank:
-        if (!$hseo_home_canonical) { $hseo_home_canonical = ''; } 
-        if (!$hseo_home_cache) { $hseo_home_cache = ''; } 
-        if (!$hseo_home_index) { $hseo_home_index = ''; } 
-        if (!$hseo_home_follow) { $hseo_home_follow = ''; }
-        
-        if (!$hseo_post_title) { $hseo_post_title = ''; } 
-        if (!$hseo_post_description) { $hseo_post_description = ''; }
-        if (!$hseo_post_keywords) { $hseo_post_keywords = ''; }
-        if (!$hseo_post_canonical) { $hseo_post_canonical = ''; } 
-        if (!$hseo_post_cache) { $hseo_post_cache = ''; }
-        if (!$hseo_post_follow) { $hseo_post_follow = ''; }
-        if (!$hseo_post_index) { $hseo_post_index = ''; } 
-        if (!$hseo_post_opengraph) { $hseo_post_opengraph = ''; }
-        
-        foreach($staticpages as $currentKey ) {
-             if (!$hseo_staticpage_title[$currentKey]) { $hseo_staticpage_title[$currentKey] = ''; }
-             if (!$hseo_staticpage_description[$currentKey]) { $hseo_staticpage_description[$currentKey] = ''; }
-             if (!$hseo_staticpage_keywords[$currentKey]) { $hseo_staticpage_keywords[$currentKey] = ''; }
-             if (!$hseo_staticpage_canonical[$currentKey]) { $hseo_staticpage_canonical[$currentKey] = ''; }
-             if (!$hseo_staticpage_cache[$currentKey]) { $hseo_staticpage_cache[$currentKey] = ''; }
-             if (!$hseo_staticpage_follow[$currentKey]) { $hseo_staticpage_follow[$currentKey] = ''; }
-             if (!$hseo_staticpage_index[$currentKey]) { $hseo_staticpage_index[$currentKey] = ''; }
-             if (!$hseo_staticpage_opengraph[$currentKey]) { $hseo_staticpage_opengraph[$currentKey] = ''; }  
-             
-             if (!$hseo_staticpage_title_data[$currentKey]) { $hseo_staticpage_title_data[$currentKey] = ''; } 
-             
-        } 
-        
+
+        // form
         echo "<form name='hseo_settings_form' action='" . BASEURL . "admin_index.php?page=plugin_settings&amp;plugin=hseo' method='post'>\n";
         
         include('templates/hseo_settings.php');
@@ -117,10 +93,7 @@ class hSEOSettings extends hSEO
         echo "<input type='hidden' name='csrf' value='" . $h->csrfToken . "' />\n";
         echo "</form>\n";
     }
-    
-    
-    
-    
+                
     
      /**
      * Save admin settings for hseo
@@ -129,187 +102,68 @@ class hSEOSettings extends hSEO
      */
     public function saveSettings($h)
     {
-        $error = 0;      
+        $error = 0;                
         
-        // home
-        if ($h->cage->post->keyExists('hseo_home_canonical')) { 
-            $hseo_home_canonical = 'checked';
-        } else {
-            $hseo_home_canonical = '';
-        }
+        // post, home
+        foreach ($this->checkedItems as $item) {
+            if ($h->cage->post->keyExists($item)) { 
+                $$item = 'checked';
+            } else {
+                $$item = '';
+            }                        
+        }                              
 
-        if ($h->cage->post->keyExists('hseo_home_cache')) { 
-            $hseo_home_cache = 'checked';
-        } else {
-            $hseo_home_cache = '';
-        }
-        
-        if ($h->cage->post->keyExists('hseo_home_index')) { 
-            $hseo_home_index = 'checked';
-        } else {
-            $hseo_home_index = '';
-        }
-        
-        if ($h->cage->post->keyExists('hseo_home_follow')) { 
-            $hseo_home_follow = 'checked';
-        } else {
-            $hseo_home_follow = '';
-        }
-        
-        // post
-        if ($h->cage->post->keyExists('hseo_post_title')) { 
-            $hseo_post_title = 'checked';
-        } else {
-            $hseo_post_title = '';
-        }
-
-        if ($h->cage->post->keyExists('hseo_post_description')) { 
-            $hseo_post_description = 'checked';
-        } else {
-            $hseo_post_description = '';
-        }
-
-         if ($h->cage->post->keyExists('hseo_post_keywords')) { 
-            $hseo_post_keywords = 'checked';
-        } else {
-            $hseo_post_keywords = '';
-        }
-        
-        if ($h->cage->post->keyExists('hseo_post_canonical')) { 
-            $hseo_post_canonical = 'checked';
-        } else {
-            $hseo_post_canonical = '';
-        }
-        
-        if ($h->cage->post->keyExists('hseo_post_cache')) { 
-            $hseo_post_cache = 'checked';
-        } else {
-            $hseo_post_cache = '';
-        }
-        
-        if ($h->cage->post->keyExists('hseo_post_follow')) { 
-            $hseo_post_follow = 'checked';
-        } else {
-            $hseo_post_follow = '';
-        }
-        
-        if ($h->cage->post->keyExists('hseo_post_index')) { 
-            $hseo_post_index = 'checked';
-        } else {
-            $hseo_post_index = '';
-        }
-        
-        if ($h->cage->post->keyExists('hseo_post_opengraph')) { 
-            $hseo_post_opengraph = 'checked';
-        } else {
-            $hseo_post_opengraph = '';
-        }
-        
-        
-        
-        // static pages
         $staticpages = $this->static_pages($h);
-        foreach($staticpages as $currentKey ) {
-        
-        if ($h->cage->post->keyExists('hseo_staticpage_title_'.$currentKey)) { 
-            $hseo_staticpage_title[$currentKey] = 'checked';
-        } else {
-            $hseo_staticpage_title[$currentKey] = '';
-        }
-
-        if ($h->cage->post->keyExists('hseo_staticpage_description_'.$currentKey)) { 
-            $hseo_staticpage_description[$currentKey] = 'checked';
-        } else {
-            $hseo_staticpage_description[$currentKey] = '';
-        }
-
-         if ($h->cage->post->keyExists('hseo_staticpage_keywords_'.$currentKey)) { 
-            $hseo_staticpage_keywords[$currentKey] = 'checked';
-        } else {
-            $hseo_staticpage_keywords[$currentKey] = '';
-        }
-        
-        if ($h->cage->post->keyExists('hseo_staticpage_canonical_'.$currentKey)) { 
-            $hseo_staticpage_canonical[$currentKey] = 'checked';
-        } else {
-            $hseo_staticpage_canonical[$currentKey] = '';
-        }
-        
-        if ($h->cage->post->keyExists('hseo_staticpage_cache_'.$currentKey)) { 
-            $hseo_staticpage_cache[$currentKey] = 'checked';
-        } else {
-            $hseo_staticpage_cache[$currentKey] = '';
-        }
-        
-        if ($h->cage->post->keyExists('hseo_staticpage_follow_'.$currentKey)) { 
-            $hseo_staticpage_follow[$currentKey] = 'checked';
-        } else {
-            $hseo_staticpage_follow[$currentKey] = '';
-        }
-        
-        if ($h->cage->post->keyExists('hseo_staticpage_index_'.$currentKey)) { 
-            $hseo_staticpage_index[$currentKey] = 'checked';
-        } else {
-            $hseo_staticpage_index[$currentKey] = '';
-        }
-        
-        if ($h->cage->post->keyExists('hseo_staticpage_opengraph_'.$currentKey)) { 
-            $hseo_staticpage_opengraph[$currentKey] = 'checked';
-        } else {
-            $hseo_staticpage_opengraph[$currentKey] = '';
-        }
-        
-        // static pages title, description and keywords input
-        // http://localhost/tkdev/admin_index.php?page=plugin_settings&plugin=hseo
-       // print_r($hseo_staticpage_title_data[$currentKey]);
-       if ($h->cage->post->keyExists('hseo_staticpage_title_data_'.$currentKey)) { 
-             $hseo_staticpage_title_data[$currentKey] = $h->cage->post->testAlnumLines('hseo_staticpage_title_data_'.$currentKey);
-        } else {
-            $hseo_staticpage_title_data[$currentKey] = '';
-        }
-        
-        
-        
+               
+        // static pages
+        foreach($staticpages as $currentKey) {
+            foreach ($this->checkedPagesItems as $item) {
+                if ($h->cage->post->keyExists($item . '_' . $currentKey)) { 
+                    ${$item}[$currentKey] = 'checked';    // using curly brackets to avoid ambiguity with array involved instead of just $$item[$currentKey] 
+                } else {
+                    ${$item}[$currentKey] = '';
+                }
+            }       
+                    
+            foreach ($this->textItems as $item) {
+                if ($h->cage->post->keyExists($item . '_' . $currentKey)) {                     
+                    ${$item}[$currentKey] = $h->cage->post->sanitizeAll($item . '_' . $currentKey);
+                } else {
+                    ${$item}[$currentKey] = '';
+                }
+            }                                               
         }
                 
         $h->pluginHook('hseo_save_settings');
         
         if ($error == 0) {
             // save settings
-            $hseo_settings['hseo_home_canonical'] = $hseo_home_canonical;
-            $hseo_settings['hseo_home_cache'] = $hseo_home_cache;
-            $hseo_settings['hseo_home_index'] = $hseo_home_index;
-            $hseo_settings['hseo_home_follow'] = $hseo_home_follow;
-
-            $hseo_settings['hseo_post_title'] = $hseo_post_title;
-            $hseo_settings['hseo_post_description'] = $hseo_post_description;
-            $hseo_settings['hseo_post_keywords'] = $hseo_post_keywords;
-            $hseo_settings['hseo_post_canonical'] = $hseo_post_canonical;
-            $hseo_settings['hseo_post_cache'] = $hseo_post_cache;
-            $hseo_settings['hseo_post_follow'] = $hseo_post_follow;
-            $hseo_settings['hseo_post_index'] = $hseo_post_index;
-            $hseo_settings['hseo_post_opengraph'] = $hseo_post_opengraph;
             
-        foreach($staticpages as $currentKey ) {
-            $hseo_settings['hseo_staticpage_title_'.$currentKey] = $hseo_staticpage_title[$currentKey];
-            $hseo_settings['hseo_staticpage_description_'.$currentKey] = $hseo_staticpage_description[$currentKey];
-            $hseo_settings['hseo_staticpage_keywords_'.$currentKey] = $hseo_staticpage_keywords[$currentKey];
-            $hseo_settings['hseo_staticpage_canonical_'.$currentKey] = $hseo_staticpage_canonical[$currentKey];
-            $hseo_settings['hseo_staticpage_cache_'.$currentKey] = $hseo_staticpage_cache[$currentKey];
-            $hseo_settings['hseo_staticpage_follow_'.$currentKey] = $hseo_staticpage_follow[$currentKey];
-            $hseo_settings['hseo_staticpage_index_'.$currentKey] = $hseo_staticpage_index[$currentKey];
-            $hseo_settings['hseo_staticpage_opengraph_'.$currentKey] = $hseo_staticpage_opengraph[$currentKey];
+            // post, home
+            foreach ($this->checkedItems as $item) {
+                $hseo_settings[$item] = $$item;
+            }                       
             
-          //  $h->updateSetting('hseo_staticpage_title_'.$currentKey, $hseo_staticpage_title_data[$currentKey]);
-            $hseo_settings['hseo_staticpage_title_data_'.$currentKey] = $hseo_staticpage_title_data[$currentKey];
-        }
+            // save static pages
+            foreach($staticpages as $currentKey ) {
+                foreach ($this->checkedPagesItems as $item) {
+                    $hseo_settings[$item . '_' . $currentKey] = ${$item}[$currentKey];
+                }
 
+                foreach ($this->textItems as $item) {
+                    $hseo_settings[$item . '_' . $currentKey] = ${$item}[$currentKey];
+                }
+            }
         
             $h->updateSetting('hseo_settings', serialize($hseo_settings));
-            
+
             $h->message = $h->lang["main_settings_saved"];
             $h->messageType = "green alert-success";
+        } else {
+            $h->message = $h->lang["main_settings_not_saved"];
+            $h->messageType = "alert-error";
         }
+        
         $h->showMessage();
         
         return true;    
