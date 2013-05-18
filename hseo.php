@@ -6,7 +6,7 @@
  * folder: hseo
  * class: hSEO
  * type: toolbox
- * hooks: install_plugin, admin_sidebar_plugin_settings, admin_plugin_settings, admin_header_include_raw, header_meta, theme_index_top, admin_plugin_tabLabel_pre_first, admin_plugin_tabContent_pre_first, admin_plugin_support
+ * hooks: install_plugin, admin_sidebar_plugin_settings, admin_plugin_settings, admin_header_include_raw, header_meta, theme_index_top, admin_plugin_support
  * author: Andreas Votteler
  * authorurl: http://www.trendkraft.de
  *
@@ -32,9 +32,16 @@
  * @link      http://www.hotarucms.org/
  */
 
+// security
+if (!class_exists('hSEO')) {
+	die();
+}
+
 class hSEO
 {             
  
+
+
     /**
     * 
     *
@@ -107,12 +114,13 @@ class hSEO
     */ 
     public function header_meta($h)
         {    
+        
             require_once(PLUGINS . 'hseo/libs/hSEOFunctions.php');
             $f = new hSEO_Functions($h);
             $f->hseo_post_redirect($h);
             $f->getmeta($h);
-           
-        }
+
+     }
 
         
     /**
@@ -138,18 +146,18 @@ class hSEO
         }
     }
    
-    public function admin_plugin_tabLabel_pre_first($h)
-    {            
-            echo '<li><a href="#editmeta" data-toggle="tab">Edit meta</a></li>';
-    }        
-
-    public function admin_plugin_tabContent_pre_first($h)
-    {                                    
-            $staticpages = $this->static_pages($h);
-            echo '<div class="tab-pane" id="editmeta">';     
-                include('templates/hseo_editmeta.php');
-            echo '</div>';
-    }
+//    public function admin_plugin_tabLabel_pre_first($h)
+//    {            
+//            echo '<li><a href="#settings" data-toggle="tab">Settings</a></li>';
+//    }        
+//
+//    public function admin_plugin_tabContent_pre_first($h)
+//    {                                    
+//            $staticpages = $this->static_pages($h);
+//            echo '<div class="tab-pane" id="settings">';     
+//                include('templates/hseo_settings.php');
+//            echo '</div>';
+//    }
 
     /**
     * Admin support for plugin
@@ -175,7 +183,7 @@ class hSEO
 
          //Das Ziel-Array
         $file_array = Array();
-        $denied_staticpage = array( '404error', 'header', 'index', 'footer', 'sidebar', 'navigation', 'settings', 'support', 'bookmarking_sort_filter');  
+        $denied_staticpage = array( '404error', 'header', 'index', 'footer', 'sidebar', 'navigation', 'settings', 'support', 'bookmarking_sort_filter', 'all', 'popular', 'upcoming', 'latest', 'pluginsdisabled', 'tag-cloud', '', '', '');  
                 
         //Wenn das Verzeichnis existiert...
         if(is_dir($dir))    {
