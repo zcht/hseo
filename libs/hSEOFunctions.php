@@ -81,18 +81,22 @@ class hSEO_Functions// extends hSEO
            $title = $hseo_settings['hseo_post_title'];
        }
        
-       if ($h->cage->get->testPage('page')) {
-           $title = $hseo_settings['hseo_staticpage_title_'.$h->cage->get->testPage('page')];
-            if ($title == true) {
-               $staticpages = $this->static_pages($h);
-               foreach($staticpages as $currentKey) {
-                   if ($h->cage->get->testPage('page') == $currentKey) {
-                       $title = $hseo_settings['hseo_staticpage_title_data_'.$h->cage->get->testPage('page')];
-                       return "<title>". $title ."</title>"."\n";
-                       break;
-                   }
-               }
-            } 
+       $page = $h->cage->get->testPage('page');
+       
+       if ($page) {
+           if (isset($hseo_settings['hseo_staticpage_title_'.$page])) {
+            $title = $hseo_settings['hseo_staticpage_title_'.$page];
+             if ($title == true) {
+                $staticpages = $this->static_pages($h);
+                foreach($staticpages as $currentKey) {
+                    if ($h->cage->get->testPage('page') == $currentKey) {
+                        $title = $hseo_settings['hseo_staticpage_title_data_'.$h->cage->get->testPage('page')];
+                        return "<title>". $title ."</title>"."\n";
+                        break;
+                    }
+                }
+             } 
+           }
        }
 //           //print_r($hseo_settings['hseo_staticpage_title_data_'.$h->cage->get->testPage('page')]);
 //           
