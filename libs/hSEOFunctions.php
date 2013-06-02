@@ -81,18 +81,22 @@ class hSEO_Functions// extends hSEO
            $title = $hseo_settings['hseo_post_title'];
        }
        
-       if ($h->cage->get->testPage('page')) {
-           $title = $hseo_settings['hseo_staticpage_title_'.$h->cage->get->testPage('page')];
-            if ($title == true) {
-               $staticpages = $this->static_pages($h);
-               foreach($staticpages as $currentKey) {
-                   if ($h->cage->get->testPage('page') == $currentKey) {
-                       $title = $hseo_settings['hseo_staticpage_title_data_'.$h->cage->get->testPage('page')];
-                       return "<title>". $title ."</title>"."\n";
-                       break;
-                   }
-               }
-            } 
+       $page = $h->cage->get->testPage('page');
+       
+       if ($page) {
+           if (isset($hseo_settings['hseo_staticpage_title_'.$page])) {
+            $title = $hseo_settings['hseo_staticpage_title_'.$page];
+             if ($title == true) {
+                $staticpages = $this->static_pages($h);
+                foreach($staticpages as $currentKey) {
+                    if ($h->cage->get->testPage('page') == $currentKey) {
+                        $title = $hseo_settings['hseo_staticpage_title_data_'.$h->cage->get->testPage('page')];
+                        return "<title>". $title ."</title>"."\n";
+                        break;
+                    }
+                }
+             } 
+           }
        }
 //           //print_r($hseo_settings['hseo_staticpage_title_data_'.$h->cage->get->testPage('page')]);
 //           
@@ -456,20 +460,11 @@ private function meta_robots($h, $cache = true, $index = true, $follow = true) {
         
 public function static_pages($h){
 
-        $themes = $h->getFiles(THEMES, array('404error.php'));
-        if (is_array($themes)) {
-            if (array_search(rtrim(THEME, '/'), $themes)) $dir = THEMES . THEME;
-//                foreach ($themes as $theme) { 
-//                        if ($theme == rtrim(THEME, '/')) {
-//                                $dir = THEMES . THEME;
-//                               // print_r($dir);
-//                        }
-//                }
-        }
+        $dir = CONTENT . 'pages';
 
          //Das Ziel-Array
         $file_array = Array();
-        $denied_staticpage = array( '404error', 'header', 'index', 'footer', 'sidebar', 'navigation', 'settings', 'support', 'bookmarking_sort_filter', 'all', 'popular', 'upcoming', 'latest', 'pluginsdisabled', 'tag-cloud', '', '', '');  
+        //$denied_staticpage = array( '404error', 'header', 'index', 'footer', 'sidebar', 'navigation', 'settings', 'support', 'bookmarking_sort_filter', 'all', 'popular', 'upcoming', 'latest', 'pluginsdisabled', 'tag-cloud', '', '', '');  
                 
         //Wenn das Verzeichnis existiert...
         if(is_dir($dir))    {
@@ -495,7 +490,7 @@ public function static_pages($h){
         }
         //Zum Schluss wird das Array ausgegeben
 //        print_r($file_array);
-        $file_array = array_diff($file_array, $denied_staticpage);
+        //$file_array = array_diff($file_array, $denied_staticpage);
         return $file_array;
         
     }
